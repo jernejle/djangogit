@@ -1,0 +1,116 @@
+#header-container {
+	width: 100%;
+	height: 60px;
+	background-color: 
+	whiteSmoke;
+	border-bottom: 1px solid 
+	#BFBFBF;
+	background-image: -webkit-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -moz-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -ms-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -o-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	box-shadow: 0 0 8px 0px 
+	rgba(0, 0, 0, 0.15);
+}
+
+#header {
+	padding-top: 20px;
+	height: 100%;
+	margin: 0 auto;
+	width: 900px;
+	text-align: center;
+	font-family: Verdana;
+	font-size: 18px;
+}
+
+#logo {
+	
+}
+
+#top_user {
+	float: right; 
+	margin: 14px 5px 0 0
+}
+
+.content{
+	border: 1px solid 
+	#DDD;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+	-webkit-box-shadow: 0 1px 2px 
+	rgba(0, 0, 0, .075);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.075);
+	box-shadow: 0 1px 2px 
+	rgba(0, 0, 0, .075);
+	height: 100%;
+	background-color: #F0F0F0;
+	
+}
+
+.container {
+	margin: auto;
+	width: 980px;
+	margin-top: 20px;
+}
+
+#navigation {
+	padding-top: 3px;
+	border-radius: 4px;
+	margin: 0 0 30px 0;
+	background: 
+	#EEE;
+	border: 1px solid 
+	#BBB;
+	height: 40px;
+	border-bottom: 1px solid 
+	#BFBFBF;
+	background-image: -webkit-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -moz-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -ms-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	background-image: -o-linear-gradient(top, 
+	#FAFAFA, 
+	#F0F0F0);
+	box-shadow: 0 0 8px 0px 
+	rgba(0, 0, 0, 0.15);
+	-moz-box-shadow: 0 0 3px #ddd;
+	-webkit-box-shadow: 0 0 3px 
+	#DDD;
+	box-shadow: 0 0 3px 
+	#DDD;
+}
+#search {
+	float: right;
+	display: inline;
+	margin: 17px 30px 0 0;
+}
+
+#search input {
+	padding: 6px 6px 6px 25px;
+	width: 150px;
+	height: 24px;
+	background: 
+	#FAFAFA url("../img/search.png") 1px center no-repeat;
+	border: 1px solid 
+	#7C9199;
+	outline: none;
+	border-radius: 4px;
+	color: 
+	gray;
+	box-shadow: 0px 1px 0px 0px 
+	white;
+}

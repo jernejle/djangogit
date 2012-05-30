@@ -1,0 +1,40 @@
+<html lang="en">
+	<head>
+		<title>{% block title %}Django GIT repository browser{% endblock %}</title>
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+	</head>
+
+	<body>
+		<div id="header-container">
+			<div id="top_user">
+				<div class="btn-group pull-right">
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon-user"></i> Username <span class="caret"></span> </a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="#">Profile</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="#">Sign Out</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div id="search">
+				<input id="searchBox" type="text">
+			</div>
+			<div id="header">
+				Django GIT repository browser
+			</div>
+		</div>
+		<div class="container">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</body>
+</html>

@@ -7,6 +7,7 @@ admin.autodiscover()
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+    url(r'^users/register/$', 'userprofile.views.register'),
     # Examples:
     # url(r'^$', 'djangogit.views.home', name='home'),
     # url(r'^djangogit/', include('djangogit.foo.urls')),
