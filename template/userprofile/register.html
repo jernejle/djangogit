@@ -2,32 +2,35 @@
 {% block content %}
 <div id="loginbox">
 	<div class="well">
-		<form class="form-horizontal">
+		<div style="color: red; text-align: center">
+			{{ form.non_field_errors }}
+		</div>
+		<form class="form-horizontal" action="/users/register/" method="post">
 			<h2 style="text-align: center">Registration</h2>
 			<br />
 			<fieldset>
 				<div class="control-group">
 					<label class="control-label" for="focusedInput">Username</label>
 					<div class="controls">
-						<input class="input-medium focused" id="focusedInput" type="text">
+						{{ form.username }} {{ form.username.errors }}
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="focusedInput">Password</label>
 					<div class="controls">
-						<input class="input-medium focused" id="focusedInput" type="password">
+						{{ form.password }} {{ form.password.errors }}
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="focusedInput">Password again</label>
 					<div class="controls">
-						<input class="input-medium focused" id="focusedInput" type="password">
+						{{ form.password2 }} {{ form.password2.errors }}
 					</div>
 				</div>
 				<div class="control-group">
 					<label class="control-label" for="focusedInput">Email</label>
 					<div class="controls">
-						<input class="input-medium focused" id="focusedInput" type="text">
+						{{ form.email }} {{ form.email.errors }}
 					</div>
 				</div>
 				<div class="form-actions">
@@ -39,6 +42,7 @@
 					</button>
 				</div>
 			</fieldset>
+			{% csrf_token %}
 		</form>
 	</div>
 </div>
