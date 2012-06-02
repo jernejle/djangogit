@@ -1,0 +1,69 @@
+{% extends 'base/index.html' %}
+{% block navigation %}
+	{% include "userprofile/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div id="loginbox">
+	<div class="well">
+		<div style="color: red; text-align: center">
+			{{ form.non_field_errors|striptags }}
+		</div>
+		<form class="form-horizontal" action="/users/my/" method="post">
+			<h2 style="text-align: center">Edit profile</h2>
+			<br />
+			<div style="color: red; text-align: center">{% if mes %} {{ mes }} {% endif %}</div><br />
+			<fieldset>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">First name</label>
+					<div class="controls">
+						<input type="text" name="first_name" value="{{ user.first_name }}" />
+						<br />
+						{{ form.first_name.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Last Name</label>
+					<div class="controls">
+						<input type="text" name="last_name" value="{{ user.last_name }}" />
+						<br />
+						{{ form.last_name.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Password</label>
+					<div class="controls">
+						{{ form.password }}
+						<br />
+						{{ form.password.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Password again</label>
+					<div class="controls">
+						{{ form.password2 }}
+						<br />
+						{{ form.password2.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Email</label>
+					<div class="controls">
+						<input type="text" name="email" value="{{ user.email }}" />
+						<br />
+						{{ form.email.errors|striptags }}
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">
+						Update
+					</button>
+					<button class="btn">
+						Home
+					</button>
+				</div>
+			</fieldset>
+			{% csrf_token %}
+		</form>
+	</div>
+</div>
+{% endblock %}

@@ -11,7 +11,7 @@ class UserForm(forms.Form):
     def clean(self):
         password = self.cleaned_data.get('password')
         password2 = self.cleaned_data.get('password2')
-        if password is not password2:
+        if password != password2:
             raise forms.ValidationError("Both passwords must match")
         return self.cleaned_data
     
@@ -25,3 +25,14 @@ class UserForm(forms.Form):
         if not username_available:
             raise forms.ValidationError("Username already exists")
         return self.cleaned_data.get('username')
+    
+class UserLogin(forms.Form):
+    username = forms.CharField(label="Username")
+    password = forms.CharField(widget=forms.PasswordInput,label="Password")
+
+class UpdateProfile(forms.Form):
+    first_name = forms.CharField(required=False)
+    last_name = forms.CharField(required=False)
+    password = forms.CharField(widget=forms.PasswordInput, label='First password field',required=False)
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Second password field',required=False)
+    email = forms.EmailField(label='Email',required=False)

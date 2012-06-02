@@ -7,22 +7,40 @@
 		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+
+		<style>
+			#navigation ul {
+				margin: auto;
+			}
+			ul li {
+				text-align: center;
+			}
+		</style>
 	</head>
 
 	<body>
 		<div id="header-container">
 			<div id="top_user">
 				<div class="btn-group pull-right">
-					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon-user"></i> Username <span class="caret"></span> </a>
+					<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon-user"></i> {% if user.username %}
+					{{ user.username }}<span class="caret"></span> </a>
 					<ul class="dropdown-menu">
 						<li>
-							<a href="#">Profile</a>
+							<a href="/users/my/">Profile</a>
 						</li>
 						<li class="divider"></li>
 						<li>
-							<a href="#">Sign Out</a>
+							<a href="/users/logout/">Sign Out</a>
 						</li>
 					</ul>
+					{% else %}
+					Anonymous <span class="caret"></span> </a>
+					<ul class="dropdown-menu">
+						<li>
+							<a href="/users/login/">Sign In</a>
+						</li>
+					</ul>
+					{% endif %}
 				</div>
 			</div>
 			<div id="search">
@@ -33,8 +51,13 @@
 			</div>
 		</div>
 		<div class="container">
+			{% block navigation %}
+			{% endblock %}
 			{% block content %}
 			{% endblock %}
 		</div>
 	</body>
+	<script type="text/javascript">
+		$('.dropdown-toggle').dropdown();
+	</script>
 </html>

@@ -3,10 +3,12 @@
 <div id="loginbox">
 	<div class="well">
 		<div style="color: red; text-align: center">
-			{{ form.non_field_errors|striptags }}
+			{% if error %}
+				{{ error }}
+			{% endif %}
 		</div>
-		<form class="form-horizontal" action="/users/register/" method="post">
-			<h2 style="text-align: center">Registration</h2>
+		<form class="form-horizontal" action="/users/login/" method="post">
+			<h2 style="text-align: center">Login</h2>
 			<br />
 			<fieldset>
 				<div class="control-group">
@@ -21,21 +23,9 @@
 						{{ form.password }} <br />{{ form.password.errors|striptags }}
 					</div>
 				</div>
-				<div class="control-group">
-					<label class="control-label" for="focusedInput">Password again</label>
-					<div class="controls">
-						{{ form.password2 }} <br />{{ form.password2.errors|striptags }}
-					</div>
-				</div>
-				<div class="control-group">
-					<label class="control-label" for="focusedInput">Email</label>
-					<div class="controls">
-						{{ form.email }} <br />{{ form.email.errors|striptags }}
-					</div>
-				</div>
 				<div class="form-actions">
 					<button type="submit" class="btn btn-primary">
-						Register
+						Login
 					</button>
 					<button class="btn">
 						Home
