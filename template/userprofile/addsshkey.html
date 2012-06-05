@@ -1,0 +1,56 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "userprofile/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="medium_box">
+	<div class="well">
+		<div style="color: red; text-align: center">
+			{{ form.non_field_errors|striptags }}
+		</div>
+		<form class="form-horizontal" action="/users/addkey/" method="post">
+			<h2 style="text-align: center">Add new SSH key</h2>
+			<br />
+			<div style="color: red; text-align: center">
+				{% if mes %} {{ mes }} {% endif %}
+			</div>
+			<br />
+			<fieldset>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Public key</label>
+					<div class="controls">
+						{{ form.key }}
+						<br />
+						{{ form.key.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Key id</label>
+					<div class="controls">
+						{{ form.keyid }}
+						<br />
+						{{ form.keyid.errors|striptags }}
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="focusedInput">Active</label>
+					<div class="controls">
+						{{ form.active }}
+						<br />
+						{{ form.active.errors|striptags }}
+					</div>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn btn-primary">
+						Add key
+					</button>
+					<button class="btn" type="reset">
+						Reset
+					</button>
+				</div>
+			</fieldset>
+			{% csrf_token %}
+		</form>
+	</div>
+</div>
+{% endblock %}

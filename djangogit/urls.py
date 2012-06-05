@@ -11,6 +11,8 @@ urlpatterns = patterns('',
     url(r'^users/login/$', 'userprofile.views.login'),
     url(r'^users/logout/$', 'userprofile.views.logout'),
     url(r'^users/my/$', 'userprofile.views.profile'),
+    url(r'^users/my/addkey/$', 'userprofile.views.addNewKey'),
+    url(r'^users/my/listkeys/$', 'userprofile.views.listkeys'),
     # Examples:
     # url(r'^$', 'djangogit.views.home', name='home'),
     # url(r'^djangogit/', include('djangogit.foo.urls')),

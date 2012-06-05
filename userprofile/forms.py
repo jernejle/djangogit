@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
+from django.forms import ModelForm
+from userprofile.models import SSHKey
+from django.contrib.auth.models import User
 
 class UserForm(forms.Form):
     username = forms.CharField(label='Username')
@@ -28,11 +31,15 @@ class UserForm(forms.Form):
     
 class UserLogin(forms.Form):
     username = forms.CharField(label="Username")
-    password = forms.CharField(widget=forms.PasswordInput,label="Password")
+    password = forms.CharField(widget=forms.PasswordInput, label="Password")
 
 class UpdateProfile(forms.Form):
     first_name = forms.CharField(required=False)
     last_name = forms.CharField(required=False)
-    password = forms.CharField(widget=forms.PasswordInput, label='First password field',required=False)
-    password2 = forms.CharField(widget=forms.PasswordInput, label='Second password field',required=False)
-    email = forms.EmailField(label='Email',required=False)
+    password = forms.CharField(widget=forms.PasswordInput, label='First password field', required=False)
+    password2 = forms.CharField(widget=forms.PasswordInput, label='Second password field', required=False)
+    email = forms.EmailField(label='Email', required=False)
+    
+class NewSSHKeyForm(ModelForm):
+    class Meta:
+        model = SSHKey

@@ -4,6 +4,9 @@ import os
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 ROOT = os.path.dirname(__file__)
+TEMP_REPODIR = os.path.join(ROOT,"../temprepo/gitolite-admin")
+GITOLITE_ADMIN_REPO = "/srv/git/repositories/gitolite-admin.git"
+LOG_FILE = os.path.join(ROOT,"../logs/log")
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -124,6 +127,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
+    'userprofile',
 )
 
 # A sample logging configuration. The only tangible logging

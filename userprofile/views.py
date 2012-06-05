@@ -1,13 +1,17 @@
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response, redirect
-from userprofile.forms import UserForm, UserLogin, UpdateProfile
+from userprofile.forms import UserForm, UserLogin, UpdateProfile, NewSSHKeyForm
 from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
-
+from djangogit import func
+from userprofile.models import SSHKey
+import datetime
 
 def register(request):
+    if request.user.is_authenticated():
+        return redirect("/users/my")
     if request.method == "POST":
         form = UserForm(request.POST)
         if form.is_valid():
@@ -62,7 +66,7 @@ def profile(request):
                         user.set_password(pass1)
                     else:
                         mes = "Passwords do not match"
-                        return render_to_response(template, {'form':form,'mes':mes}, context_instance=RequestContext(request))
+                        return render_to_response(template, {'form':form, 'mes':mes}, context_instance=RequestContext(request))
                 data = form.cleaned_data
                 if data.get('first_name'):
                     user.first_name = data.get('first_name')
@@ -75,3 +79,46 @@ def profile(request):
         else:
             mes = "Cannot update profile"
             return render_to_response(template, {'form':form, 'mes':mes}, context_instance=RequestContext(request))
+
+@login_required
+def addNewKey(request):
+    template = "userprofile/addsshkey.html"
+    if request.method == "GET":
+        form = NewSSHKeyForm()
+        return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+    elif request.method == "POST":
+        form = NewSSHKeyForm(request.POST)
+        
+        if form.is_valid():
+            object = form.save(commit=False)
+            object.user = request.user
+            object.datetime = datetime.datetime.now()
+            object.save()
+            
+            # add key to gitolite-admin repo if key is active
+            if object.active: 
+                func.cloneAdminRepo()
+                func.addKey(request.user, object.key, object.keyid)
+                keyfile = "keydir/%s/%s@%s.pub" %(request.user,request.user,object.keyid)
+                func.gitAdd(keyfile)
+                message = "SSH key %s@%s.pub added" %(request.user,object.keyid)
+                func.commitChange(message)
+                func.pushUpstream()
+            return HttpResponse("valid")
+        else:
+            return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+        
+@login_required
+def listkeys(request):
+    template = "userprofile/listsshkeys.html"
+    keys = SSHKey.objects.filter(user=request.user)
+    return render_to_response(template, {'keys':keys}, context_instance=RequestContext(request))
+
+def activateKey(request):
+    pass
+
+def editKey(request):
+    pass
+
+def deleteKey(request):
+    pass

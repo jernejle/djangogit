@@ -1,0 +1,39 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "userprofile/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="content">
+	<h2>Your SSH keys</h2>
+	{% if keys %}
+	<table id="tablekeys" class="table table-striped">
+		<thead>
+			<tr>
+				<th>Key</th>
+				<th>Key ID</th>
+				<th>Date added</th>
+				<th>Active</th>
+				<th>Activate</th>
+				<th>Edit</th>
+				<th>Delete</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for key in keys %}
+			<tr>
+				<td> {{ key.key|truncatechars:20 }} </td>
+				<td> {{ key.keyid }} </td>
+				<td> {{ key.datetime }} </td>
+				<td> {{ key.active }} </td>
+				<td> Activate </td>
+				<td> Edit </td>
+				<td> Delete </td>
+			</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+	{% else %}
+	No SSH keys to display
+	{% endif %}
+</div>
+{% endblock %}
