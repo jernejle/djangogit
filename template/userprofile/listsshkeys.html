@@ -14,7 +14,6 @@
 				<th>Date added</th>
 				<th>Active</th>
 				<th>Activate</th>
-				<th>Edit</th>
 				<th>Delete</th>
 			</tr>
 		</thead>
@@ -24,16 +23,15 @@
 				<td> {{ key.key|truncatechars:20 }} </td>
 				<td> {{ key.keyid }} </td>
 				<td> {{ key.datetime }} </td>
-				<td> {{ key.active }} </td>
-				<td> Activate </td>
-				<td> Edit </td>
-				<td> Delete </td>
+				<td> {% if key.active %} <i class="icon-ok"></i> {% else %} <i class="icon-remove"></i>  {% endif %} </td>
+				<td> {% if not key.active %} <a href="activatekey/{{ key.id }}/">Activate</a> {% else %} <a href="deactivatekey/{{ key.id }}/">Deactivate</a> {% endif %} </td>
+				<td> <a href="deletekey/{{ key.id }}/">Delete</a></td>
 			</tr>
 			{% endfor %}
 		</tbody>
 	</table>
 	{% else %}
-	No SSH keys to display
+		<div id="content_text">No SSH keys to display. Would you like to add new?</div>
 	{% endif %}
 </div>
 {% endblock %}

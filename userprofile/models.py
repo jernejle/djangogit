@@ -8,7 +8,7 @@ class SSHKey(models.Model):
     key = models.TextField()
     keyid = models.CharField(max_length=20)
     active = models.BooleanField(blank=True)
-    datetime = models.DateTimeField(default=datetime.datetime.now(), blank=True)
+    datetime = models.DateTimeField(blank=True)
     user = models.ForeignKey(User,blank=True,null=True)
     
     def __unicode__(self):

@@ -49,16 +49,35 @@ def gitAdd(file):
     repo.git.execute(addcommand)
     
 def initRepo():
-    repo = None
-    try:
-        repo = Repo(TEMP_REPODIR)
-    except git.exc.NoSuchPathError:
-        #log error
-        pass
-    finally:
-        return repo
+    cloneAdminRepo()
+    repo = Repo(TEMP_REPODIR)
+    return repo
     
 def pushUpstream():
     repo = initRepo()
     command = ["gitolite","push"]
     repo.git.execute(command)
+    
+def deleteKeyFile(key):
+    repo = initRepo()
+    command = ["git","rm","-f",key]
+    repo.git.execute(command)
+    
+def addRepo(username,reponame,perm):
+    repo = initRepo()
+    dir = "%s/conf/%s" %(TEMP_REPODIR,username)
+    
+    if not os.path.isdir(dir):
+        os.makedirs(dir)
+    conf = "%s/%s.conf" %(dir,reponame)
+    file = open(conf,'w')
+    repowrite = "repo %s/%s \n" %(username,reponame) 
+    permwrite = "    %s    =    %s" %(perm,username)
+    file.write(repowrite)
+    file.write(permwrite)
+    file.close()
+
+def appendToGitoliteConf(file,line):
+    file = open(file,'a')
+    file.write(line)
+    file.close()

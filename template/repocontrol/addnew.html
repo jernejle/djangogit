@@ -1,6 +1,6 @@
 {% extends "base/index.html" %}
 {% block navigation %}
-{% include "userprofile/profilemenu.html" %}
+{% include "repocontrol/profilemenu.html" %}
 {% endblock %}
 {% block content %}
 <div class="medium_box">
@@ -8,8 +8,8 @@
 		<div style="color: red; text-align: center">
 			{{ form.non_field_errors|striptags }}
 		</div>
-		<form class="form-horizontal" action="/users/my/addkey/" method="post">
-			<h2 style="text-align: center">Add new SSH key</h2>
+		<form class="form-horizontal" action="/new/" method="post">
+			<h2 style="text-align: center">Create new repository</h2>
 			<br />
 			<div style="color: red; text-align: center">
 				{% if mes %} {{ mes }} {% endif %}
@@ -17,32 +17,32 @@
 			<br />
 			<fieldset>
 				<div class="control-group">
-					<label class="control-label" for="focusedInput">Public key</label>
+					<label class="control-label" for="focusedInput">Repository name</label>
 					<div class="controls">
-						{{ form.key }}
+						{{ form.name }}
 						<br />
-						{{ form.key.errors|striptags }}
+						{{ form.name.errors|striptags }}
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="focusedInput">Key id</label>
+					<label class="control-label" for="focusedInput">Description</label>
 					<div class="controls">
-						{{ form.keyid }}
+						{{ form.description }}
 						<br />
-						{{ form.keyid.errors|striptags }}
+						{{ form.description.errors|striptags }}
 					</div>
 				</div>
 				<div class="control-group">
-					<label class="control-label" for="focusedInput">Active</label>
+					<label class="control-label" for="focusedInput">Private</label>
 					<div class="controls">
-						{{ form.active }}
+						{{ form.private }}
 						<br />
-						{{ form.active.errors|striptags }}
+						{{ form.private.errors|striptags }}
 					</div>
 				</div>
 				<div class="form-actions">
 					<button type="submit" class="btn btn-primary">
-						Add key
+						Add new repository
 					</button>
 					<button class="btn" type="reset">
 						Reset

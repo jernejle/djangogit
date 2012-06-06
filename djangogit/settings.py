@@ -5,6 +5,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 ROOT = os.path.dirname(__file__)
 TEMP_REPODIR = os.path.join(ROOT,"../temprepo/gitolite-admin")
+GITOLITE_CONF = "%s/conf/gitolite.conf" %TEMP_REPODIR
 GITOLITE_ADMIN_REPO = "/srv/git/repositories/gitolite-admin.git"
 LOG_FILE = os.path.join(ROOT,"../logs/log")
 
@@ -75,7 +76,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    "%s/../static",
+    "%s/../static" % ROOT,
 )
 
 # List of finder classes that know how to find static files in
@@ -127,7 +128,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django.contrib.admindocs',
-    'userprofile',
+    'userprofile','repocontrol',
 )
 
 # A sample logging configuration. The only tangible logging

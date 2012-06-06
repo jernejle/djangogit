@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 from django.template import RequestContext
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response, redirect, get_object_or_404
 from userprofile.forms import UserForm, UserLogin, UpdateProfile, NewSSHKeyForm
 from django.contrib.auth.models import User
 from django.contrib import auth
@@ -33,7 +33,7 @@ def login(request):
             user = auth.authenticate(username=data.get('username'), password=data.get('password'))
             if user and user.is_active:
                 auth.login(request, user)
-                return redirect("/")
+                return redirect(profile)
             else:
                 error = "Username or password incorrect"
                 return render_to_response(template, {'form':form, 'error':error}, context_instance=RequestContext(request))
@@ -53,7 +53,7 @@ def profile(request):
     if request.method == "GET":
         user = User.objects.get(username=request.user.username)
         form = UpdateProfile()
-        return render_to_response(template, {'form':form, 'user':user}, context_instance=RequestContext(request))
+        return render_to_response(template, {'form':form, 'user':user, 'activelink':request.path}, context_instance=RequestContext(request))
     elif request.method == "POST":
         form = UpdateProfile(request.POST)
         if form.is_valid():
@@ -66,7 +66,7 @@ def profile(request):
                         user.set_password(pass1)
                     else:
                         mes = "Passwords do not match"
-                        return render_to_response(template, {'form':form, 'mes':mes}, context_instance=RequestContext(request))
+                        return render_to_response(template, {'form':form, 'mes':mes, 'activelink':request.path}, context_instance=RequestContext(request))
                 data = form.cleaned_data
                 if data.get('first_name'):
                     user.first_name = data.get('first_name')
@@ -78,14 +78,14 @@ def profile(request):
                 return redirect('/users/my/')
         else:
             mes = "Cannot update profile"
-            return render_to_response(template, {'form':form, 'mes':mes}, context_instance=RequestContext(request))
+            return render_to_response(template, {'form':form, 'mes':mes, 'activelink':request.path}, context_instance=RequestContext(request))
 
 @login_required
 def addNewKey(request):
     template = "userprofile/addsshkey.html"
     if request.method == "GET":
         form = NewSSHKeyForm()
-        return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+        return render_to_response(template, {'form':form, 'activelink':request.path}, context_instance=RequestContext(request))
     elif request.method == "POST":
         form = NewSSHKeyForm(request.POST)
         
@@ -104,21 +104,53 @@ def addNewKey(request):
                 message = "SSH key %s@%s.pub added" %(request.user,object.keyid)
                 func.commitChange(message)
                 func.pushUpstream()
-            return HttpResponse("valid")
+            return redirect(listkeys)
         else:
-            return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+            return render_to_response(template, {'form':form, 'activelink':request.path}, context_instance=RequestContext(request))
         
 @login_required
 def listkeys(request):
     template = "userprofile/listsshkeys.html"
     keys = SSHKey.objects.filter(user=request.user)
-    return render_to_response(template, {'keys':keys}, context_instance=RequestContext(request))
+    return render_to_response(template, {'keys':keys, 'activelink':request.path}, context_instance=RequestContext(request))
 
-def activateKey(request):
-    pass
+@login_required
+def activatekey(request,keyid):
+    key = get_object_or_404(SSHKey,pk=keyid)
+    
+    if key.active:
+        return redirect(listkeys)
+    func.addKey(request.user, key.key, key.keyid)
+    keyfile = "keydir/%s/%s@%s.pub" %(request.user,request.user,key.keyid)
+    func.gitAdd(keyfile)
+    message = "SSH key %s@%s.pub added" %(request.user,key.keyid)
+    func.commitChange(message)
+    func.pushUpstream()
+    key.active = True
+    key.save()
+    return redirect(listkeys)
 
-def editKey(request):
-    pass
+def deletekey(request,keyid):
+    key = get_object_or_404(SSHKey, pk=keyid)
+    keyfile = keyfile = "keydir/%s/%s@%s.pub" %(request.user,request.user,key.keyid)
+    func.deleteKeyFile(keyfile)
+    message = "Deleted keyfile %s@%s.pub" %(request.user,key.keyid)
+    func.commitChange(message)
+    func.pushUpstream()
+    key.delete()
+    return redirect(listkeys)
+    
 
-def deleteKey(request):
-    pass
+def deactivatekey(request,keyid):
+    key = get_object_or_404(SSHKey,pk=keyid)
+    if not key.active:
+        return redirect(listkeys)
+    
+    keyfile = keyfile = "keydir/%s/%s@%s.pub" %(request.user,request.user,key.keyid)
+    func.deleteKeyFile(keyfile)
+    message = "Deleted keyfile %s@%s.pub" %(request.user,key.keyid)
+    func.commitChange(message)
+    func.pushUpstream()
+    key.active = False
+    key.save()
+    return redirect(listkeys)
