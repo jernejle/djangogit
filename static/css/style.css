@@ -95,7 +95,10 @@
 	left: 50%;
 }
 
-#chiuld li{float:left;position:relative;}/* ie needs position:relative here*/
+#chiuld li {
+	float: left;
+	position: relative;
+}/* ie needs position:relative here*/
 
 #search {
 	float: right;
@@ -145,4 +148,96 @@ h2 {
 #content_text {
 	padding-left: 20px;
 	padding-top: 30px;
+}
+
+.repobox {
+	margin-top: 10px;
+	font-size: 12px;
+	color: #333;
+	padding: 10px;
+	background: #F0F0F0;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+}
+
+.repobox input {
+	margin: 2px 0 0 15px;
+	height: 25px;
+	width: 300px;
+}
+
+.repobox button {
+	height: 25px;
+}
+
+.reponame {
+	font-size: 18px;
+	font-family: Verdana;
+	color: #08C;
+}
+
+.news {
+	margin-top: 30px;
+	font-size: 12px;
+	color: #333;
+	padding: 13px;
+	background: #FAFAFA;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+	margin-bottom: 50px;
+}
+
+.newstitle {
+	margin-top: 30px;
+	font-size: 16px;
+	font-family: Verdana;
+	color: #08C;
+}
+
+hr {
+	margin-top: 10px;
+}
+
+.latest-commit-top {
+	font-size: 13px;
+	padding: 10px;
+	border: 1px solid #C5D5DD;
+	border-bottom: none;
+	border-radius: 4px;
+}
+
+.latest-commit-bottom {
+	margin-top: -5px;
+	padding: 2px 2px 2px 10px;
+	background: #F0F0F0;
+	border: 1px solid #C5D5DD;
+	border-radius: 4px;
+}
+
+.commit-sha {
+	float: right;
+	padding-right: 5px;
+}
+
+.files {
+	margin-top: 30px;
+	color: #333;
+	padding: 13px;
+	background: #FAFAFA;
+	border: 1px solid #DDDDDD;
+	border-radius: 3px;
+	margin-bottom: 50px;
+}
+
+.files table {
+	font-size: 13px;
+}
+
+.files thead {
+	background: #F0F0F0;
+	border: 1px solid #C5D5DD;
+}
+
+.branches {
+	float: right;
 }

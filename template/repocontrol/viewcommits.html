@@ -1,0 +1,31 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+<div class="branches">
+	<select id="branches" name="branch">
+		{% if branches %}
+		{% for branch in branches %}
+		<option value="{{branch}}" {% if branch == "origin/master" %} selected="selected" {% endif %}>{{branch}}</option>
+		{% endfor %}
+		{% endif %}
+	</select>
+</div><br /><br />
+{% if commits %}
+{% for commit in commits %}
+<div class="latest-commit-top">
+	<i class="icon-info-sign"></i>
+	{{ commit.message}}
+</div>
+<div class="latest-commit-bottom" style="margin-bottom: 30px">
+	<b>{{ commit.author }}</b> on {{ commit.date.date }} at {{ commit.date.time }} <span class="commit-sha">{{ commit.sha }}</span>
+</div>
+<hr />
+{% endfor %}
+{% endif %}
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+<div class="files">
+	<div class="branches">
+		<select id="branches" name="branch">
+			{% if branches %}
+				{% for branch in branches %}
+					<option value="{{branch}}" {% if branch == "origin/master" %} selected="selected" {% endif %}>{{branch}}</option>
+				{% endfor %}
+			{% endif %}
+		</select>
+	</div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>File name</th>
+				<th>Last Commit</th>
+				<th>Message</th>
+			</tr>
+		</thead>
+		<tbody id="filesbody">
+			<script type="text/javascript">
+				Dajaxice.repocontrol.getobjects(Dajax.process, {
+					'userid' : pn[1],
+					'slug' : pn[2],
+					'sha' : 'master'
+				})
+				$("#branches").click(function() {
+					$(".table > tbody").empty();
+					Dajaxice.repocontrol.getobjects(Dajax.process, {
+						'userid' : pn[1],
+						'slug' : pn[2],
+						'sha' : $(this).val()
+					})
+				});
+			</script>
+		</tbody>
+	</table>
+</div>
+{% endblock %}

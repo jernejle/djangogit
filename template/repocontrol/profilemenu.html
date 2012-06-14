@@ -1,20 +1,23 @@
 <div id="navigation">
 	<div id="child">
 		<ul class="nav nav-pills" style="text-align: center">
-			<li>
-				<a href="#">Home</a>
+			<li {% if not activelink %} class="active" {% endif %}>
+				<a href="{{ href }}">Repository</a>
 			</li>
-			<li>
-				<a href="#">View your profile</a>
+			<li {% if activelink == "files" %} class="active" {% endif %}>
+				<a href="{{ href }}files/">Files</a>
+			</li>
+			<li {% if activelink == "viewcommits" %} class="active" {% endif %}>
+				<a href="{{ href }}commits">Commits</a>
 			</li>
 			<li {% if activelink == "/users/my/" %} class="active" {% endif %}>
-				<a href="/users/my">Edit your profile</a>
+				<a href="/users/my">Issues</a>
 			</li>
 			<li {% if activelink == "/users/my/listkeys/" %} class="active" {% endif %}>
-				<a href="/users/my/listkeys">List all SSH keys</a>
+				<a href="/users/my/listkeys">Team</a>
 			</li>
 			<li {% if activelink == "/users/my/addkey/" %} class="active" {% endif %}>
-				<a href="/users/my/addkey">Add new SSH key</a>
+				<a href="/users/my/addkey">Branches</a>
 			</li>
 		</ul>
 	</div>

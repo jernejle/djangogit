@@ -7,6 +7,7 @@ ROOT = os.path.dirname(__file__)
 TEMP_REPODIR = os.path.join(ROOT,"../temprepo/gitolite-admin")
 GITOLITE_CONF = "%s/conf/gitolite.conf" %TEMP_REPODIR
 GITOLITE_ADMIN_REPO = "/srv/git/repositories/gitolite-admin.git"
+REPODIR = "/srv/git/repositories/"
 LOG_FILE = os.path.join(ROOT,"../logs/log")
 
 ADMINS = (
@@ -94,7 +95,7 @@ SECRET_KEY = '@!a_bd9^$m)p6f6rq2732yher$jmxwl_qjpz5g76#9r9rr1v8&amp;'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -129,6 +130,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.admindocs',
     'userprofile','repocontrol',
+    'dajaxice','dajax',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -161,3 +163,4 @@ LOGGING = {
 }
 
 LOGIN_URL = '/users/login/'
+DAJAXICE_MEDIA_PREFIX="dajaxice"
