@@ -14,6 +14,8 @@ from dajaxice.decorators import dajaxice_register
 from django.http import Http404
 from django.utils.encoding import smart_str, smart_unicode
 import datetime
+import re
+import pdb
 
 @login_required
 def addnewrepo(request):
@@ -51,13 +53,16 @@ def viewrepo(request, userid, slug):
         return render_to_response(template, {'reponame':obj.get('reponame'), 'repodb':obj.get('repo'), 'latest_commit':latest_commit, 'date':comm_date, 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':''}, context_instance=RequestContext(request))
     # else statement
     
-def viewfiles(request, userid, slug):
+def viewfiles(request, userid, slug, branch="origin/master"):
     template = "repocontrol/viewfiles.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
     branches = func.getBranches("")
     branches.pop(0)
-    return render_to_response(template, {'reponame':obj.get('reponame'), 'branches':branches, 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'files'}, context_instance=RequestContext(request))
+    
+    if not branch in branches:
+            raise Http404
+    return render_to_response(template, {'chosenbranch':branch,'reponame':obj.get('reponame'), 'branches':branches, 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'files'}, context_instance=RequestContext(request))
 
 def showcommits(request,userid,slug,branch="origin/master"):
     template = "repocontrol/viewcommits.html"
@@ -77,5 +82,35 @@ def showcommits(request,userid,slug,branch="origin/master"):
                 newcom = {'author':smart_str(commit.author),'message':smart_str(commit.message),'date':datetime.datetime.fromtimestamp(commit.committed_date), 'sha':commit.hexsha}
                 comlist.append(newcom)
 
-        return render_to_response(template, {'reponame':obj.get('reponame'), 'commits':comlist, 'branches':branches, 'repodb':obj.get('repo'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'viewcommits'}, context_instance=RequestContext(request))
+        return render_to_response(template, {'reponame':obj.get('reponame'), 'requestedbranch': branch,'commits':comlist, 'branches':branches, 'repodb':obj.get('repo'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'viewcommits'}, context_instance=RequestContext(request))
     return HttpResponse(branch)
+
+def commit(request,userid,slug,sha):
+    template = "repocontrol/viewcommit.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    
+    repo = Repo("/home/jernej/django")
+    try:
+        commit = repo.commit(sha)
+        difflist = repo.git.execute(["git","diff-tree","-p",sha]).splitlines()
+    except:
+        commit = None
+    
+    if not commit or not difflist:
+        raise Http404
+    
+    del difflist[0]
+    difffiles = []
+    seperate = []
+    for line in difflist:
+        if re.search("diff --git a/.* b/.*$",line):
+            if seperate:
+                difffiles.append(seperate)
+            seperate = []
+        seperate.append(line + "\n")
+        if line == difflist[-1]:
+            difffiles.append(seperate)
+    
+    commitobj = {'author':smart_str(commit.author), 'date':datetime.datetime.fromtimestamp(commit.committed_date), 'message': smart_str(commit.message), 'tree':commit.tree, 'parents':commit.parents, 'sha':commit.hexsha}
+    return render_to_response(template, {'diff':difffiles,'commit':commitobj,'reponame':obj.get('reponame'),'activelink':'viewcommits','href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))

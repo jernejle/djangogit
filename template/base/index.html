@@ -5,15 +5,17 @@
 		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
 		<link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
 		<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/prettify.css" rel="stylesheet">
 		{% dajaxice_js_import %}
 		<script src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
 		<script src="{{ STATIC_URL }}/js/jquery.dajax.core.js" type="text/javascript" charset="utf-8"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
 		<script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
 		<script src="{{ STATIC_URL }}js/script.js"></script>
+		<script src="{{ STATIC_URL }}js/prettify.js"></script>
 	</head>
 
-	<body>
+	<body onload="prettyPrint()">
 		<div id="header-container">
 			<div id="top_user">
 				<div class="btn-group pull-right">

@@ -241,3 +241,10 @@ hr {
 .branches {
 	float: right;
 }
+
+#commitinfo {
+	font-size: 13px;
+	color: #333;
+	background: #FAFAFA;
+	margin-bottom: 40px;
+}

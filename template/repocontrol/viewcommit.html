@@ -1,0 +1,52 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if commit %}
+<table id="commitinfo" class="table table-bordered">
+	<tbody>
+		<tr>
+			<th>Author</th>
+			<td>{{ commit.author }}</td>
+		</tr>
+		<tr>
+			<th>Date commited</th>
+			<td>{{ commit.date }}</td>
+		</tr>
+		<tr>
+			<th>Message</th>
+			<td>{{ commit.message }}</td>
+		</tr>
+		<tr>
+			<th>Commit SHA</th>
+			<td>{{ commit.sha }}</td>
+		</tr>
+		<tr>
+			<th>Tree</th>
+			<td>{{ commit.tree }}</td>
+		</tr>
+		<tr>
+			<th>Parent</th>
+			<td>{% for p in commit.parents %} {{ p }} {% endfor %}</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+<script type="text/javascript">
+	var sha = "{{ commit.sha }}"
+</script>
+
+{% if diff %}
+{% for entry in diff %}
+<pre id="commitdiff" class="prettyprint linenums">
+{{ entry|join:"" }}
+</pre>
+{% endfor %}
+{% endif %}
+{% endblock %}

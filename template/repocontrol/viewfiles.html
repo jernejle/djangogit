@@ -12,7 +12,7 @@
 		<select id="branches" name="branch">
 			{% if branches %}
 				{% for branch in branches %}
-					<option value="{{branch}}" {% if branch == "origin/master" %} selected="selected" {% endif %}>{{branch}}</option>
+					<option value="{{branch}}" {% if branch == chosenbranch %} selected="selected" {% endif %}>{{branch}}</option>
 				{% endfor %}
 			{% endif %}
 		</select>
@@ -21,8 +21,6 @@
 		<thead>
 			<tr>
 				<th>File name</th>
-				<th>Last Commit</th>
-				<th>Message</th>
 			</tr>
 		</thead>
 		<tbody id="filesbody">
@@ -30,15 +28,10 @@
 				Dajaxice.repocontrol.getobjects(Dajax.process, {
 					'userid' : pn[1],
 					'slug' : pn[2],
-					'sha' : 'master'
+					'sha' : '{{ chosenbranch }}'
 				})
 				$("#branches").click(function() {
-					$(".table > tbody").empty();
-					Dajaxice.repocontrol.getobjects(Dajax.process, {
-						'userid' : pn[1],
-						'slug' : pn[2],
-						'sha' : $(this).val()
-					})
+					window.location = "/"+pn[1]+"/"+pn[2]+"/files/"+$(this).val()
 				});
 			</script>
 		</tbody>

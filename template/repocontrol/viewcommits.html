@@ -11,7 +11,7 @@
 	<select id="branches" name="branch">
 		{% if branches %}
 		{% for branch in branches %}
-		<option value="{{branch}}" {% if branch == "origin/master" %} selected="selected" {% endif %}>{{branch}}</option>
+		<option value="{{branch}}" {% if requestedbranch == branch %} selected="selected" {% endif %}>{{branch}}</option>
 		{% endfor %}
 		{% endif %}
 	</select>
@@ -23,9 +23,14 @@
 	{{ commit.message}}
 </div>
 <div class="latest-commit-bottom" style="margin-bottom: 30px">
-	<b>{{ commit.author }}</b> on {{ commit.date.date }} at {{ commit.date.time }} <span class="commit-sha">{{ commit.sha }}</span>
+	<b>{{ commit.author }}</b> on {{ commit.date.date }} at {{ commit.date.time }} <span class="commit-sha"><a href="{{ href }}commit/{{ commit.sha }}">{{ commit.sha }}</a></span>
 </div>
 <hr />
 {% endfor %}
 {% endif %}
+<script type="text/javascript">
+	$("#branches").click(function(){
+		window.location = "/"+pn[1]+"/"+pn[2]+"/commits/"+$(this).val()
+	});
+</script>
 {% endblock %}

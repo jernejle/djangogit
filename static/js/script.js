@@ -18,3 +18,11 @@ function writeBlob(data) {
 function test(data) {
 	alert(data)
 }
+
+function getDiff() {
+	Dajaxice.repocontrol.getCommitDiff(Dajax.process,{'userid':pn[1],'slug':pn[2], 'sha':sha})
+}
+
+function writeDiff(data) {
+	$("#commitdiff").html(data)
+}
