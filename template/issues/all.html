@@ -1,0 +1,65 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "issues/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if issues %}
+<div id="issues">
+	{% for issue in issues %}
+	<div class="issue-top">
+		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>
+	</div>
+	<div class="issue-bottom">
+		<b>{{ issue.author }}</b> on {{ issue.published.date }} at {{ issue.published.time }} <span class="issue-type">{{ issue.get_label_display }}</span>
+	</div>
+	{% endfor %}
+</div>
+<div id="issue-menu">
+	<ul class="nav nav-pills nav-stacked">
+		<li class="active" id="0">
+			<a href="#">All</a>
+		</li>
+		<li id="open">
+			<a href="#">Open</a>
+		</li>
+		<li id="1">
+			<a href="#">Bugs</a>
+		</li>
+		<li id="2">
+			<a href="#">Enhacements</a>
+		</li>
+		<li id="3">
+			<a href="#">Questions</a>
+		</li>
+		<li id="closed">
+			<a href="#">Closed</a>
+		</li>
+	</ul>
+</div>
+{% endif %}
+<script type="text/javascript">
+	var tempid = "0";
+	$(document).ready(function() {
+		$("#issue-menu li").click(function() {
+			if (tempid != $(this).attr("id")) {
+				$("#" + tempid).removeClass()
+				$(this).addClass('active')
+				$(".issue-top").remove();
+				$(".issue-bottom").remove();
+				tempid = $(this).attr("id")
+				Dajaxice.issues.getObjectsByTag(Dajax.process, {
+					'userid' : pn[1],
+					'slug' : pn[2],
+					'tag' : $(this).attr("id")
+				});
+			}
+		});
+	});
+
+</script>
+{% endblock %}

@@ -112,6 +112,8 @@ def getRepoObjorNone(userid, slug):
         return None
     reponame = "%s/%s" % (user_obj, repo.slug)
     repoObj = getRepoObject(reponame)
+    if not repoObj:
+        return None
     obj = {'repoObj':repoObj, 'reponame':reponame, 'user_obj':user_obj, 'repo':repo}
     return obj
 

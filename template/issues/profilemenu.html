@@ -1,0 +1,21 @@
+<div id="navigation">
+	<div id="child">
+		<ul class="nav nav-pills" style="text-align: center">
+			<li>
+				<a href="{{ href }}">Repository</a>
+			</li>
+			<li {% if activelink == "add" %} class="active" {% endif %}>
+				<a href="{{ href }}issues/add/">Add new issue</a>
+			</li>
+			<li {% if activelink == "browse" %} class="active" {% endif %}>
+				<a href="{{ href }}issues/">Browse issues</a>
+			</li>
+			<li {% if activelink == "viewcommits" %} class="active" {% endif %}>
+				<a href="{{ href }}commits">Active</a>
+			</li>
+			<li {% if activelink == "viewcommits" %} class="active" {% endif %}>
+				<a href="{{ href }}commits">View yours</a>
+			</li>
+		</ul>
+	</div>
+</div>

@@ -51,10 +51,10 @@ def getBlob(request,userid,slug,sha):
 
 @dajaxice_register
 def getCommitDiff(request,userid,slug,sha):
-    repo = Repo("/home/jernej/django")
+    repo = Repo("/home/jernej/django")  
     try:
         commit = repo.commit(sha)
-        difflist = repo.git.execute(["git","diff-tree","-p","c4c7fbcc0d9264beb931b45969fc0d8d655c4f83"])
+        difflist = repo.git.execute(["git","diff-tree","-p",sha])
     except:
         commit = None
     

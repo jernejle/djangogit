@@ -248,3 +248,124 @@ hr {
 	background: #FAFAFA;
 	margin-bottom: 40px;
 }
+
+.newissue {
+	margin-top: 30px;
+	color: #333;
+	padding: 10px;
+	background: #FAFAFA;
+	border: 1px solid #DDDDDD;
+	border-radius: 3px;
+	margin-bottom: 50px;
+}
+
+.formactions {
+	text-align: right;
+}
+
+#ui-datepicker-div {
+	font-size: 12px;
+}
+
+.issue-top {
+	width: 580px;
+	font-size: 13px;
+	padding: 10px;
+	border: 1px solid #C5D5DD;
+	border-bottom: none;
+	border-radius: 4px;
+}
+
+.issue-bottom {
+	width: 588px;
+	margin-top: -5px;
+	margin-bottom: 30px;
+	padding: 2px 2px 2px 10px;
+	background: #F0F0F0;
+	border: 1px solid #C5D5DD;
+	border-radius: 4px;
+}
+
+#issues {
+	margin-top: 20px;
+	float: left;
+}
+
+#issue-menu {
+	margin-top: 20px;
+	width: 200px;
+	float: right;
+}
+
+.issue-type {
+	float: right;
+	padding-right: 5px;
+}
+
+.main-issue {
+	font-size: 12px;
+	color: #333;
+	margin-left: 20px;
+	background: #F0F0F0;
+	border: 1px solid red;
+}
+
+.issue {
+	background-color: blue;
+}
+
+.userinfo {
+	border: 1px solid green;
+}
+
+.detail-issue-top {
+	padding: 2px 2px 2px 10px;
+	background: #F0F0F0;
+	border: 1px solid #C5D5DD;
+	border-bottom: none;
+	border-radius: 4px;
+	text-align: right;
+}
+
+.detail-issue-bottom {
+	font-size: 13px;
+	padding: 10px;
+	margin-top: -2px;
+	border: 1px solid #C5D5DD;
+	border-radius: 4px;
+}
+
+.issuetitle {
+	font-size: 16px;
+}
+
+#write-issue-comment {
+	float: right;
+	margin-top: 50px;
+	margin-bottom: 30px;
+	width: 500px;
+}
+
+#write-issue-comment textarea {
+	width: 500px;
+}
+
+.comment-top {
+	margin-top: 20px;
+	margin-left: 80px;
+	background: #F0F0F0;
+	font-size: 13px;
+	padding: 10px;
+	border: 1px solid #C5D5DD;
+	border-bottom: none;
+	border-radius: 4px;
+}
+
+.comment-bottom {
+	margin-left: 80px;
+	margin-top: -2px;
+	padding: 2px 2px 2px 10px;
+	border: 1px solid #C5D5DD;
+	border-radius: 4px;
+	text-align: right;
+}

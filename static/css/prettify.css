@@ -70,16 +70,13 @@
 	}
 }
 pre.prettyprint {
-	padding: 2px;
+	padding: 5px;
 	border: 1px solid #888
 }
 ol.linenums {
 	padding-left: 10px;
 	margin-top: 0;
 	margin-bottom: 0
-}
-li.L0, li.L1, li.L2, li.L3, li.L5, li.L6, li.L7, li.L8 {
-	list-style-type: none
 }
 li.L1, li.L3, li.L5, li.L7, li.L9 {
 	background: #eee

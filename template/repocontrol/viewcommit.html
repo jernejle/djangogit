@@ -38,15 +38,23 @@
 	</tbody>
 </table>
 {% endif %}
-<script type="text/javascript">
-	var sha = "{{ commit.sha }}"
-</script>
+<script type="text/javascript">var sha = "{{ commit.sha }}"</script>
 
 {% if diff %}
 {% for entry in diff %}
+<h3>
+{% if "deleted file mode" in entry|slice:"1:2"|join:"" %}
+deleted 
+{% elif "new file mode" in entry|slice:"1:2"|join:"" %}
+added
+{% endif %}
+{{entry|slice:"0:1"|join:""}}
+</h3>
+<div id ="{{entry|slice:"0:1"|join:""}}">
 <pre id="commitdiff" class="prettyprint linenums">
-{{ entry|join:"" }}
+{% if "new file mode" in entry|slice:"1:2"|join:"" or "deleted file mode" in entry|slice:"1:2"|join:"" %}{{ entry|slice:"5:"|join:"" }}{% else %}{{ entry|slice:"4:"|join:"" }}{% endif %}
 </pre>
+</div>
 {% endfor %}
 {% endif %}
 {% endblock %}

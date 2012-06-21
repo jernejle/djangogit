@@ -105,6 +105,8 @@ def commit(request,userid,slug,sha):
     seperate = []
     for line in difflist:
         if re.search("diff --git a/.* b/.*$",line):
+            linespl = line.split(" ")
+            line = linespl[2][2:]
             if seperate:
                 difffiles.append(seperate)
             seperate = []

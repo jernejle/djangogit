@@ -1,0 +1,67 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "issues/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<script type="text/javascript">
+	$(function() {
+		$("#id_deadline").datepicker();
+	});
+</script>
+<div class="newissue">
+	<div style="color: red; text-align: center">
+		{{ form.non_field_errors|striptags }}
+	</div>
+	<form class="form-horizontal" action="{{ href }}issues/add/" method="post">
+		<h2 style="text-align: center">Open new issue</h2>
+		<br />
+		<div style="color: red; text-align: center">
+			{% if mes %} {{ mes }} {% endif %}
+		</div>
+		<br />
+		<fieldset>
+			<div class="control-group">
+				<label class="control-label" for="focusedInput">Title</label>
+				<div class="controls">
+					{{ form.title }}
+					<br />
+					{{ form.title.errors|striptags }}
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="focusedInput">Content</label>
+				<div class="controls">
+					{{ form.content }}
+					<br />
+					{{ form.content.errors|striptags }}
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="focusedInput">Label</label>
+				<div class="controls">
+					{{ form.label }}
+					<br />
+					{{ form.label.errors|striptags }}
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="focusedInput">Deadline</label>
+				<div class="controls">
+					{{ form.deadline }}
+					<br />
+					{{ form.deadline.errors|striptags }}
+				</div>
+			</div>
+			<div class="formactions">
+				<button type="submit" class="btn btn-primary">
+					Add new issue
+				</button>
+				<button class="btn" type="reset">
+					Reset
+				</button>
+			</div>
+		</fieldset>
+		{% csrf_token %}
+	</form>
+</div>
+{% endblock %}
