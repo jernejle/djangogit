@@ -78,7 +78,7 @@ def addRepo(username, reponame, perm):
         os.makedirs(dir)
     conf = "%s/%s.conf" % (dir, reponame)
     file = open(conf, 'w')
-    repowrite = "repo %s/%s \n" % (username, reponame) 
+    repowrite = "repo %s/%s" % (username, reponame) 
     permwrite = "    %s    =    %s" % (perm, username)
     file.write(repowrite)
     file.write(permwrite)
@@ -121,8 +121,8 @@ def objOr404(obj):
     if not obj:
         raise Http404
 
-def getAllObjects(type,branchorsha):
-    repoobject = Repo("/home/jernej/django")
+def getAllObjects(repo,type,branchorsha):
+    repoobject = repo
     treestr = repoobject.git.execute(["git","ls-tree",branchorsha]).replace("\t"," ").splitlines()
     objects = []
     
@@ -137,17 +137,105 @@ def getAllObjects(type,branchorsha):
         typeobjects = [x for x in objects if x["type"] == "blob"]
     return typeobjects
 
-def showBlob(sha):
-    repoobject = Repo("/home/jernej/django")
+def showBlob(repo,sha):
+    repoobject = repo
     blob = repoobject.git.execute(["git","show",sha])
     return blob
 
 def getBranches(repo):
-    repoobject = Repo("/home/jernej/django")
-    branches = repoobject.git.execute(["git","branch","-r"]).replace(" ", "").splitlines()
+    repoobject = repo
+    branches = repoobject.git.execute(["git","branch","-a"]).strip("*").replace(" ", "").splitlines()
     return branches
 
-def getCommits(repo,branch):
-    repoobject = Repo("/home/jernej/django")
-    commits = repoobject.iter_commits(branch, max_count=20)
+def getCommits(repo,branch,per_page,skip):
+    repoobject = repo
+    commits = repoobject.iter_commits(branch,max_count=per_page, skip=skip)
     return commits
+
+def getTeam(username,slug):
+    repo = initRepo()
+    if not repo:
+        return None
+    
+    head_tree = repo.head.commit.tree
+    conf_tree = head_tree.trees[0]
+    
+    stream = None
+    permissions = []
+    if conf_tree.name == "conf":
+        for t in conf_tree.trees:
+            if t.name == username:
+                for blob in t.blobs:
+                    if blob.name == "%s.conf" % (slug):
+                        stream = blob.data_stream.read().splitlines()
+    foundrepo = 0
+    if stream:
+        for line in stream:
+            if re.search("repo .*/.*",line):
+                foundrepo = 1
+                continue
+            elif foundrepo == 1:
+                linesplit = line.split("=")
+                try:
+                    perm = getPermissions(linesplit[0].strip())
+                    tmp = {'perm':perm, 'user':linesplit[1].strip()}
+                    permissions.append(tmp)
+                except:
+                    pass
+    return permissions
+
+def getPermissions(type):
+    perm = None
+    if type == "R":
+        perm = "Read only"
+    elif type == "RW":
+        perm = "Read and Write data"
+    elif type == "RW+":
+        perm = "Read, Write and Delete data"
+    elif type == "-":
+        perm = "Denied"
+    
+    return perm
+
+def addTeamMember(reponame,user,perm):
+    repo = initRepo()
+    if not repo:
+        return None
+    
+    dir = "%s/conf/%s.conf" % (TEMP_REPODIR, reponame)
+    if os.path.exists(dir):
+        permwrite = "\n    %s    =    %s" % (perm, user)
+        file = open(dir,"a")
+        file.write(permwrite)
+        file.close()
+        
+def delTeamMember(reponame,user):
+    repo = initRepo()
+    if not repo:
+        return False
+    
+    dir = "%s/conf/%s.conf" % (TEMP_REPODIR, reponame)
+    if os.path.exists(dir):
+        try:
+            oldfile = os.rename(dir, "%s.old" % dir)
+            old = open("%s.old" % dir, "r")
+            newfile = open(dir, "w+")
+            
+            for line in old:
+                if line.strip():
+                    if re.search("repo .*/.*",line):
+                        newfile.write(line)
+                        continue
+                    if re.search("RW+|RW|R|",line):
+                        if user in line:
+                            continue
+                    newfile.write(line)
+                else:
+                    continue
+            old.close()
+            newfile.close()
+            return True
+        except:
+            return False
+    else:
+        return False

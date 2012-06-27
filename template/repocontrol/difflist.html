@@ -1,0 +1,54 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if commits %}
+<div id="clearlist">
+	<button type="submit" class="btn btn-primary">
+		Clear list
+	</button>
+</div>
+{% for commit in commits %}
+<div class="commitgroup">
+	<b>Author:</b> {{ commit.author }}
+	<br />
+	<b>Date commited:</b> {{ commit.date }}
+	<br />
+	<b>Message:</b> {{ commit.message }}
+	<br />
+	<b>Commit SHA:</b> {{ commit.sha }}
+	<br />
+	<br />
+	<p id="{{ commit.sha }}">
+		<b>Diff to</b>
+		<br />
+		<select name="diffto">
+			{% for a in commits %} {% if commit.sha != a.sha %}<option value="{{ a.sha }}">{{ a.sha }}</option>{% endif %}{% endfor %}
+		</select>
+		<br />
+	</p>
+</div>
+{% endfor %}
+
+<script type="text/javascript">
+	$("select").click(function() {
+		if ($(this).val() != "" && $(this).val() != null) {
+			window.location = "{{ href }}diff/" + $(this).parent().attr('id') + "/" + $(this).val();
+		}
+	});
+	$("#clearlist").click(function() {
+		$(".commitgroup").remove()
+		Dajaxice.repocontrol.clearlist(Dajax.process, {
+			'userid' : pn[1],
+			'slug' : pn[2]
+		});
+	}); 
+</script>
+{% endif %}
+{% endblock %}

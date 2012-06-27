@@ -42,19 +42,55 @@
 
 {% if diff %}
 {% for entry in diff %}
-<h3>
-{% if "deleted file mode" in entry|slice:"1:2"|join:"" %}
-deleted 
+<h3> {% if "deleted file mode" in entry|slice:"1:2"|join:"" %}
+deleted
 {% elif "new file mode" in entry|slice:"1:2"|join:"" %}
 added
 {% endif %}
-{{entry|slice:"0:1"|join:""}}
-</h3>
+{{entry|slice:"0:1"|join:""}} </h3>
 <div id ="{{entry|slice:"0:1"|join:""}}">
-<pre id="commitdiff" class="prettyprint linenums">
+	<pre id="commitdiff" class="prettyprint linenums">
 {% if "new file mode" in entry|slice:"1:2"|join:"" or "deleted file mode" in entry|slice:"1:2"|join:"" %}{{ entry|slice:"5:"|join:"" }}{% else %}{{ entry|slice:"4:"|join:"" }}{% endif %}
 </pre>
 </div>
 {% endfor %}
+{% endif %}
+
+{% if comments %}
+<hr />
+<h2>Comments</h2>
+<div id="comments">
+	{% for comment in comments %}
+	<div class="comment-top">
+		{{ comment.comment|linebreaks }}
+	</div>
+	<div class="comment-bottom">
+		<b>{{ comment.author }}</b><i> on {{ comment.date.date }} at {{ comment.date.time }}</i>
+	</div>
+	{% endfor %}
+</div>
+{% endif %}
+
+{% if user.username %}
+
+<div id="write-issue-comment">
+	<form action="{{ href }}commit/{{ commit.sha }}/post/" method="post">
+		<div class="control-group">
+			<label class="control-label" for="focusedInput">Comment</label>
+			<div class="controls">
+				{{ form.comment }}
+				<br />
+				{{ form.comment.errors|striptags }}
+			</div>
+		</div>
+		<div class="formactions">
+			<button type="submit" class="btn btn-primary">
+				Comment
+			</button>
+		</div>
+		{% csrf_token %}
+	</form>
+</div>
+
 {% endif %}
 {% endblock %}

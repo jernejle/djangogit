@@ -19,3 +19,13 @@ class Repository(models.Model):
             self.slug = slugify(self.name)
     
         super(Repository, self).save(*args, **kwargs)
+        
+class CommitComment(models.Model):
+    comment = models.TextField()
+    date = models.DateTimeField(blank=True, null=True)
+    sha = models.TextField(blank=True, null=True)
+    repository = models.ForeignKey(Repository, blank=True, null=True)
+    author = models.ForeignKey(User, blank=True, null=True)
+    
+    def __unicode__(self):
+        return str(self.date)

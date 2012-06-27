@@ -1,0 +1,48 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if team %}
+<table id="users_perm" class="table table-bordered">
+	<tbody>
+		{% for member in team %}
+		<tr>
+			<th>{{ member.user }}</th>
+			<td>{{ member.perm }}</td>
+			<td><a href="{{ href }}delperm/?user={{ member.user }}">Delete</a></td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endif %}
+<div id="newteammember" style="float: right; margin-top: 40px">
+<form class=" form-inline" method="post" action="{{ href }}team/">
+<input type="text" name="username" id="users" class="input-medium" placeholder="User">
+<select class="input-medium" name="perm">
+	<option value="r">Read</option>
+	<option value="rw">Read and Write</option>
+	<option value="rw+">Read, Write and Delete</option>
+</select>
+
+<button type="submit" class="btn">
+	Add member
+</button>
+{% csrf_token %}
+</form>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		$("#users").autocomplete({
+			source : "{{ href }}getmembers/",
+			minLength : 2,
+		});
+	}); 
+</script>
+{% endblock %}

@@ -156,7 +156,7 @@ h2 {
 	color: #333;
 	padding: 10px;
 	background: #F0F0F0;
-	border: 1px solid #DDD;
+	border: 1px solid #C5D5DD;
 	border-radius: 3px;
 }
 
@@ -182,7 +182,7 @@ h2 {
 	color: #333;
 	padding: 13px;
 	background: #FAFAFA;
-	border: 1px solid #DDD;
+	border: 1px solid #C5D5DD;
 	border-radius: 3px;
 	margin-bottom: 50px;
 }
@@ -368,4 +368,77 @@ hr {
 	border: 1px solid #C5D5DD;
 	border-radius: 4px;
 	text-align: right;
+}
+
+#deadline {
+	float: right;
+}
+
+#closeopen {
+	margin-top: 30px;
+	font-size: 14px;
+	float: right;
+}
+
+.previous {
+	float: left;
+	font-size: 14px;
+	margin-bottom: 20px;
+}
+
+.next {
+	font-size: 14px;
+	float: right;
+	margin-bottom: 20px;
+}
+
+#commits {
+	margin-top: 20px;
+}
+
+#users_perm {
+	font-size: 12px;
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#comments {
+	margin-top: 50px;
+	color: #333;
+	margin-bottom: 50px;
+}
+
+.commitgroup {
+	margin-top: 10px;
+	font-size: 13px;
+	padding: 13px;
+	background: #FAFAFA;
+	border: 1px solid #DDD;
+	border-radius: 3px;
+	margin-bottom: 20px;
+}
+
+#difftitle {
+	font-family: monospace;
+	font-style: italic;
+	font-size: 15px;
+	margin-bottom: 30px;
+}
+
+#clearlist {
+	text-align: right;
+	margin-bottom: 10px;
+}
+
+#searchcommits {
+	margin-top: 20px;
+}
+
+.news-small {
+	padding: 6px;
+}
+
+.timenews {
+	float: right;
 }

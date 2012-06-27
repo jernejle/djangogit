@@ -15,22 +15,69 @@
 		{% endfor %}
 		{% endif %}
 	</select>
-</div><br /><br />
+</div>
+<br />
+<br />
+<br />
+{% if hasprevious %}
+<div class="previous">
+	<a href="{{ href }}commits/{{ requestedbranch }}/?page={{ previouspage }}">Previous</a>
+</div>
+{% endif %}
+{% if hasnext %}
+<div class="next">
+	<a href="{{ href }}commits/{{ requestedbranch }}/?page={{ nextpage }}">Next</a>
+</div>
+{% endif %}
+<br />
+<div id="searchcommits">
+	<form class="well form-search">
+		<input type="text" name="param" class="input-medium">
+		&nbsp;
+		<select name="searchtype">
+			<option value="author">commit author</option><option value="another">another</option>
+		</select>
+		<button type="submit" class="btn">
+			Search
+		</button>
+	</form>
+</div>
 {% if commits %}
-{% for commit in commits %}
-<div class="latest-commit-top">
-	<i class="icon-info-sign"></i>
-	{{ commit.message}}
+<div id="commits">
+	{% for commit in commits %}
+	<div class="latest-commit-top">
+		<i class="icon-info-sign"></i>
+		{{ commit.message}}
+	</div>
+	<div class="latest-commit-bottom" style="margin-bottom: 30px">
+		<b>{{ commit.author }}</b> on {{ commit.date.date }} at {{ commit.date.time }} <span id="{{ commit.sha }}" class="commit-sha"><a class="shahref" href="{{ href }}commit/{{ commit.sha }}">{{ commit.sha }}</a><img src="{{ STATIC_URL }}/img/diffpic.png" class="addtodifflist" title="Add to diff list" alt="Add to difflist" height="20" width="40" /></span>
+	</div>
+	<hr />
+	{% endfor %}
 </div>
-<div class="latest-commit-bottom" style="margin-bottom: 30px">
-	<b>{{ commit.author }}</b> on {{ commit.date.date }} at {{ commit.date.time }} <span class="commit-sha"><a href="{{ href }}commit/{{ commit.sha }}">{{ commit.sha }}</a></span>
+{% else %}
+No commits
+{% endif %}
+{% if hasprevious %}
+<div class="previous">
+	<a href="{{ href }}commits/{{ requestedbranch }}/?page={{ previouspage }}">Previous</a>
 </div>
-<hr />
-{% endfor %}
+{% endif %}
+{% if hasnext %}
+<div class="next">
+	<a href="{{ href }}commits/{{ requestedbranch }}/?page={{ nextpage }}">Next</a>
+</div>
 {% endif %}
 <script type="text/javascript">
-	$("#branches").click(function(){
-		window.location = "/"+pn[1]+"/"+pn[2]+"/commits/"+$(this).val()
+	$("#branches").click(function() {
+		window.location = "/" + pn[1] + "/" + pn[2] + "/commits/" + $(this).val()
 	});
+	$(".addtodifflist").click(function() {
+		Dajaxice.repocontrol.addtodifflist(Dajax.process, {
+			'userid' : pn[1],
+			'slug' : pn[2],
+			'sha' : $(this).parent().attr("id")
+		});
+	}); 
 </script>
 {% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if diff %}
+
+<div id="difftitle"> Diff <a href="{{ href }}commit/{{ sha1 }}">{{ sha1 }}</a> <a href="{{ href }}commit/{{ sha2 }}">{{ sha2 }}</a></div>
+
+{% for entry in diff %}
+<h3>{{entry|slice:"0:1"|join:""}}</h3>
+<div>
+	<pre id="commitdiff" class="prettyprint linenums">
+{{ entry|slice:"4:"|join:"" }}
+</pre>
+</div>
+{% endfor %}
+
+{% endif %}
+{% endblock %}

@@ -10,11 +10,11 @@
 			<li {% if activelink == "browse" %} class="active" {% endif %}>
 				<a href="{{ href }}issues/">Browse issues</a>
 			</li>
-			<li {% if activelink == "viewcommits" %} class="active" {% endif %}>
-				<a href="{{ href }}commits">Active</a>
+			<li {% if activelink == "active" %} class="active" {% endif %}>
+				<a href="{{ href }}issues/active/">Active</a>
 			</li>
-			<li {% if activelink == "viewcommits" %} class="active" {% endif %}>
-				<a href="{{ href }}commits">View yours</a>
+			<li {% if activelink == "my" %} class="active" {% endif %}>
+				<a href="{{ href }}issues/my/">View yours</a>
 			</li>
 		</ul>
 	</div>

@@ -154,3 +154,6 @@ def deactivatekey(request,keyid):
     key.active = False
     key.save()
     return redirect(listkeys)
+
+def viewprofile(request, keyid):
+    pass

@@ -10,6 +10,7 @@ class Issue(models.Model):
     open = models.BooleanField(blank=True)
     label = models.CharField(max_length=1, choices=LABELS)
     deadline = models.DateField(blank=True, null=True)
+    last_action = models.DateField(blank=True, null=True)
     repository = models.ForeignKey(Repository, blank=True, null=True)
     author = models.ForeignKey(User, blank=True, null=True)
     

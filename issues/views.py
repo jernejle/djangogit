@@ -5,6 +5,8 @@ from djangogit import func
 from issues.forms import NewIssue, NewComment
 from django.contrib.auth.decorators import login_required
 from issues.models import Issue, IssueComment
+from django.db.models import Q
+import pdb
 import datetime
 
 @login_required
@@ -33,7 +35,7 @@ def all(request, userid, slug):
     template = "issues/all.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
-    issues = Issue.objects.filter(repository=obj.get('repo'))
+    issues = Issue.objects.filter(repository=obj.get('repo')).order_by('-published')
     return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'browse'}, context_instance=RequestContext(request))
 
 def details(request, userid, slug, keyid):
@@ -56,9 +58,46 @@ def postcomment(request,userid,slug,keyid):
             comment = form.save(commit=False)
             comment.author = request.user
             comment.date = datetime.datetime.now()
-            comment.issue = issue 
+            issue.last_action = datetime.datetime.now()
+            issue.save()
+            comment.issue = issue
             comment.save()
         return redirect("/%s/%s/issues/%s/" %(userid,slug,keyid))
     else:
         return redirect("/")
+    
+def active(request,userid,slug):
+    template = "issues/active.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    now = datetime.datetime.now()
+    yest = datetime.datetime.now() - datetime.timedelta(days=1)
+    issues = Issue.objects.filter(Q(published__year=now.year,published__month=now.month,published__day=now.day) | Q(published__year=yest.year,published__month=yest.month,published__day=yest.day))
+    return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'active'}, context_instance=RequestContext(request))
+
+def changestatus(request,userid,slug,keyid):
+    if request.method == "POST":
+        obj = func.getRepoObjorNone(userid, slug)
+        func.objOr404(obj)
+        issue = get_object_or_404(Issue, pk=keyid)
+        if not issue.author == request.user:
+            return redirect("/")
+        
+        if issue.open:
+            issue.open = False
+        else:
+            issue.open = True
+        
+        issue.save()
+        return redirect("/%s/%s/issues/%s/" %(userid,slug,keyid))
+    else:
+        return redirect("/")
+
+@login_required
+def myissues(request,userid,slug):
+    template = "issues/active.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    issues = Issue.objects.filter(author=request.user)
+    return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'my'}, context_instance=RequestContext(request))
     

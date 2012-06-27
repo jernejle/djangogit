@@ -3,6 +3,9 @@
 {% include "repocontrol/profilemenu.html" %}
 {% endblock %}
 {% block content %}
+{% if empty %}
+push files first
+{% else %}
 <div class="reponame">
 	<b>{{ reponame }}</b>
 </div>
@@ -28,7 +31,8 @@
 	Latest news
 	<hr />
 </div>
-<span style="font-size: 10px">Latest commit on master branch</span><br />
+<span style="font-size: 10px">Latest commit on master branch</span>
+<br />
 <div class="latest-commit-top">
 	<i class="icon-info-sign"></i>
 	{{ latest_commit.message}}
@@ -37,14 +41,23 @@
 	<b>{{ latest_commit.author }}</b> on {{ date.date }} at {{ date.time }} <span class="commit-sha">{{ latest_commit.hexsha }}</span>
 </div>
 <div class="news">
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque eleifend ornare lacinia. Phasellus eget leo sit amet dolor pellentesque cursus. Fusce sit amet mi diam. Suspendisse potenti. Suspendisse nec est dolor. Morbi sed metus eu nunc porta viverra in eget nisi. Pellentesque vehicula tellus vitae nunc vestibulum at cursus velit iaculis. Nunc ut varius neque. Nulla consequat, sem id egestas sagittis, enim mauris tempor lorem, non mattis nunc ante vitae nulla.
-	<br />
-	Ut volutpat molestie nisl eu semper. Quisque egestas nibh ac erat suscipit ut semper risus porta. Vestibulum justo risus, lobortis sit amet blandit quis, ultrices id ligula. Integer eleifend ornare erat nec dignissim. Etiam ipsum nisi, placerat eget feugiat at, posuere sit amet dui. Nulla facilisi. Donec risus ligula, suscipit id placerat eget, adipiscing at diam.
-	<br />
-	Nulla rhoncus, nisi sed ultricies dapibus, enim purus congue mauris, at lacinia nulla odio ac erat. Nullam pharetra adipiscing neque, eget viverra metus rutrum quis. Etiam et neque lacus, et ullamcorper sem. In venenatis cursus ullamcorper. Integer magna felis, vehicula et sollicitudin quis, laoreet nec risus. Pellentesque malesuada dolor et mauris dapibus iaculis. Aliquam non augue urna, et pretium justo. Sed quis eros tortor, eget tincidunt dolor. Mauris dui tortor, consequat a scelerisque id, luctus eget tortor. Cras tincidunt sollicitudin neque at euismod.
-	<br />
-	Praesent sodales accumsan ligula sit amet placerat. In mattis malesuada arcu sed tempor. Donec nec diam ut urna lobortis dictum sit amet non quam. Nulla iaculis, urna in adipiscing venenatis, elit magna varius augue, sit amet cursus augue arcu sit amet nisl. Proin venenatis lacinia dignissim. Praesent quis turpis et mi scelerisque semper. Proin sollicitudin lorem vel nunc congue pulvinar. Proin eu neque lacus. Nam et diam sed augue tempus fringilla ac sed mi. Nullam ornare lorem eu sem gravida vestibulum. Aliquam dignissim eros ac nisl ornare pulvinar. Donec dictum ligula dui. Sed at placerat ante.
-
-	Maecenas nec tellus in arcu mattis dignissim quis bibendum odio. Sed vitae tortor leo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Cras fermentum urna sit amet quam dignissim facilisis a eget risus. Maecenas vel rutrum dolor. Duis ut neque nisi, id lobortis nisi. Pellentesque a risus leo. Donec dignissim porta turpis sit amet facilisis. Aliquam non rhoncus nulla. Sed lobortis, elit faucibus porttitor volutpat, erat dolor placerat orci, sit amet varius libero ipsum sed magna. Sed elementum orci id dui fringilla luctus. Nunc rutrum vestibulum
+	{% if latest_issues %}
+	{% for issue in latest_issues %}
+	<div class="news-small">
+		{% if issue.label == "1" %}<i class="icon-exclamation-sign"></i>{% elif issue.label == "2" %}<i class="icon-leaf"></i>{% elif issue.label == "3" %} <i class="icon-question-sign"></i> {% endif %} <a href="/users/viewprofile/{{ issue.author.id }}/">{{ issue.author.username }}</a> oppened new <a href="{{ href }}issues/{{ issue.id }}/">issue</a><span class="timenews">{{ issue.published.date }} at {{ issue.published.time }}</span>
+	</div>
+	{% endfor %}
+	{% endif %}
+	<hr />
+	{% if issues_latest_comments %}
+	{% for c in issues_latest_comments %}
+		{% for a in c %}
+	<div class="news-small">
+		<i class=" icon-pencil"></i> <a href="/users/viewprofile/{{ a.author.id }}/">{{ a.author.username }}</a> commented in <a href="{{ href }}issues/{{ a.issue.id }}/">{{ a.issue.title }}</a><span class="timenews">{{ a.date.date }} at {{ a.date.time }}</span>
+	</div>
+		 {% endfor %}
+	{% endfor %}
+	{% endif %}
 </div>
+{% endif %}
 {% endblock %}

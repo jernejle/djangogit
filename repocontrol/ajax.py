@@ -16,8 +16,8 @@ def getobjects(request,userid,slug,sha):
         return
     
     dajax = Dajax()
-    trees = func.getAllObjects("tree",sha)
-    blobs = func.getAllObjects("blob",sha)
+    trees = func.getAllObjects(obj.get('repoObj'),"tree",sha)
+    blobs = func.getAllObjects(obj.get('repoObj'),"blob",sha)
     icon = "<i class='icon-folder-close'></i>"
     tablerow = ["<tr><td id='%s' class='tree'>%s %s</td></tr>" % (obj["sha"],icon,obj["name"]) for obj in trees]
     dajax.append("#filesbody", "innerHTML", ''.join(tablerow))
@@ -32,13 +32,12 @@ def getBlob(request,userid,slug,sha):
     userid = int(userid)
     slug = escape(slug)
     sha = escape(sha)
-    #obj = func.getRepoObjorNone(userid, slug)
-    #if not obj:
-    #    return
+    obj = func.getRepoObjorNone(userid, slug)
+    if not obj:
+        return
     
-    #rep = Repo("/home/jernej/django")
     try:
-        blob = func.showBlob(sha).replace("\n","<br />")
+        blob = func.showBlob(obj.get('repoObj'),sha).replace("\n","<br />")
     except:
         blob = None
         
@@ -51,10 +50,15 @@ def getBlob(request,userid,slug,sha):
 
 @dajaxice_register
 def getCommitDiff(request,userid,slug,sha):
-    repo = Repo("/home/jernej/django")  
+    userid = int(userid)
+    slug = escape(slug)
+    sha = escape(sha)
+    obj = func.getRepoObjorNone(userid, slug)
+    if not obj:
+        return
     try:
-        commit = repo.commit(sha)
-        difflist = repo.git.execute(["git","diff-tree","-p",sha])
+        commit = obj.get('repoObj').commit(sha)
+        difflist = obj.get('repoObj').git.execute(["git","diff-tree","-p",sha])
     except:
         commit = None
     
@@ -63,4 +67,44 @@ def getCommitDiff(request,userid,slug,sha):
     
     dajax = Dajax()
     dajax.add_data(''.join(difflist), "writeDiff")
+    return dajax.json()
+
+@dajaxice_register
+def addtodifflist(request,userid,slug,sha):
+    userid = int(userid)
+    slug = escape(slug)
+    sha = escape(sha)
+    obj = func.getRepoObjorNone(userid, slug)
+    if not obj:
+        return
+    
+    #sha exists ?
+    reponame = "%s%s" %(userid,slug)
+    reposession = request.session.get(reponame, None)
+    shalist = []
+    
+    if not reposession:
+        shalist.append(sha)
+        request.session[reponame] = shalist
+    else:
+        shalist = reposession
+        if sha not in shalist:
+            shalist.append(sha)
+        request.session[reponame] = shalist
+    dajax = Dajax()
+    return dajax.json()
+
+@dajaxice_register
+def clearlist(request,userid,slug):
+    userid = int(userid)
+    slug = escape(slug)
+    obj = func.getRepoObjorNone(userid, slug)
+    if not obj:
+        return
+    
+    reponame = "%s%s" %(userid,slug)
+    if request.session.get(reponame,None):
+        request.session[reponame] = None
+        
+    dajax = Dajax()
     return dajax.json()

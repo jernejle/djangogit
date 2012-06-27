@@ -1,5 +1,5 @@
 from django import forms
-from repocontrol.models import Repository
+from repocontrol.models import Repository, CommitComment
 from django.core.exceptions import ObjectDoesNotExist
 
 class NewRepo(forms.ModelForm):
@@ -18,3 +18,8 @@ class NewRepo(forms.ModelForm):
         if repo:
             raise forms.ValidationError("Repository with the same name already exists")
         return cleaned_data
+
+
+class NewComment(forms.ModelForm):
+    class Meta:
+        model = CommitComment

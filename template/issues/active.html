@@ -1,0 +1,23 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "issues/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+{% if issues %}
+<div>
+	{% for issue in issues %}
+	<div class="issue-top">
+		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>
+	</div>
+	<div class="issue-bottom">
+		<b>{{ issue.author }}</b> on {{ issue.published.date }} at {{ issue.published.time }} <span class="issue-type">{{ issue.get_label_display }}</span>
+	</div>
+	{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

@@ -11,24 +11,40 @@
 <div class="issuetitle">
 	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %} {{ issue.title }}
 </div>
+<br />
 <div class="detail-issue-top">
 	<b>{{ issue.author }}</b><i> on {{ issue.published.date }} at {{ issue.published.time }}</i>
 </div>
 <div class="detail-issue-bottom">
-	Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas iaculis sodales justo sit amet egestas. Donec in felis nisi, ac tristique tellus. Aenean eu nisl turpis, at facilisis sem. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Suspendisse turpis diam, interdum ac molestie at, ornare eget mi. Cras at nisl vel ligula elementum eleifend. In eu elit ut turpis lacinia feugiat. Sed cursus quam id nulla sollicitudin pretium. Morbi blandit, metus ut fringilla suscipit, turpis dolor lacinia magna, ac tristique lacus enim sed ante. Morbi blandit, leo in lobortis porta, libero quam facilisis sapien, dignissim tempor ligula felis a massa. Donec rhoncus tristique molestie. Pellentesque vehicula, nulla quis sollicitudin tincidunt, urna neque volutpat lorem, quis dignissim turpis augue id leo. Nam rutrum arcu ut mi consequat elementum. Suspendisse consequat, sem sed tincidunt euismod, arcu felis accumsan metus, sit amet faucibus velit magna id purus.
+	{{ issue.content|linebreaks }}
 </div>
 {% if comments %}
-	{% for comment in comments %}
-	<div class="comment-top">
-		{{ comment.comment }}
-	</div>
-	<div class="comment-bottom">
-		<b>{{ comment.author }}</b><i> on {{ comment.date.date }} at {{ comment.date.time }}</i>
-	</div>
-	{% endfor %}
+{% for comment in comments %}
+<div class="comment-top">
+	{{ comment.comment }}
+</div>
+<div class="comment-bottom">
+	<b>{{ comment.author }}</b><i> on {{ comment.date.date }} at {{ comment.date.time }}</i>
+</div>
+{% endfor %}
 {% endif %}
 
-{% if user.username %}
+{% if issue.author.username == user.username %}
+<div id="closeopen">
+	<form method="post" name="submit" action="{{ href }}issues/{{ issue.id }}/status/">
+		<button type="submit" class="btn btn-primary">
+			{% if issue.open %}
+			Close issue
+			{% else %}
+			Open issue
+			{% endif %}
+		</button>
+		{% csrf_token %}
+	</form>
+</div>
+{% endif %}
+
+{% if user.username and issue.open or user.username == issue.author.username %}
 <div id="write-issue-comment">
 	<form action="{{ href }}issues/{{ issue.id }}/post/" method="post">
 		<div class="control-group">

@@ -12,7 +12,7 @@
 <div id="issues">
 	{% for issue in issues %}
 	<div class="issue-top">
-		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>
+		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>{% if issue.deadline %} <span id="deadline">{{ issue.deadline }}</span>{% endif %}
 	</div>
 	<div class="issue-bottom">
 		<b>{{ issue.author }}</b> on {{ issue.published.date }} at {{ issue.published.time }} <span class="issue-type">{{ issue.get_label_display }}</span>
