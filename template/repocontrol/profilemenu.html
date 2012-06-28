@@ -1,9 +1,13 @@
 <div id="navigation">
 	<div id="child">
 		<ul class="nav nav-pills" style="text-align: center">
+			<li {% if activelink == "home" %} class="active" {% endif %}>
+				<a href="/">Home</a>
+			</li>
 			<li {% if not activelink %} class="active" {% endif %}>
 				<a href="{{ href }}">Repository</a>
 			</li>
+			{% if not empty %}
 			<li {% if activelink == "files" %} class="active" {% endif %}>
 				<a href="{{ href }}files/">Files</a>
 			</li>
@@ -19,6 +23,7 @@
 			<li {% if activelink == "team" %} class="active" {% endif %}>
 				<a href="{{ href }}team/">Team</a>
 			</li>
+			{% endif %}
 		</ul>
 	</div>
 </div>

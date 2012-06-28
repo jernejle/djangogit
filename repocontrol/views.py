@@ -24,7 +24,7 @@ def addnewrepo(request):
     template = "repocontrol/addnew.html"
     if request.method == "GET":
         form = NewRepo()
-        return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+        return render_to_response(template, {'activelink':'addnew','form':form}, context_instance=RequestContext(request))
     elif request.method == "POST":
         form = NewRepo(request.POST)
         if form.is_valid():
@@ -43,25 +43,36 @@ def addnewrepo(request):
             func.pushUpstream()
             return HttpResponse("added")
         else:
-            return render_to_response(template, {'form':form}, context_instance=RequestContext(request))
+            return render_to_response(template, {'activelink':'addnew','form':form}, context_instance=RequestContext(request))
         
 def viewrepo(request, userid, slug):
     template = "repocontrol/viewrepo.html"
     obj = func.getRepoObjorNone(userid, slug)
-    func.objOr404(obj)
+    userobj = User.objects.get(pk=userid)
+    
     empty = False
-    try:
-        comm_date = datetime.datetime.fromtimestamp(obj.get('repoObj').head.commit.committed_date)
-        latest_commit = obj.get('repoObj').head.commit
+    try:    
+        repo = Repository.objects.get(user=userobj, slug=slug)
     except:
-        #no commits -> no files
+        repo = None
+    
+    if not repo:
+        raise Http404
+    elif repo and obj:  
+        try:
+            comm_date = datetime.datetime.fromtimestamp(obj.get('repoObj').head.commit.committed_date)
+            latest_commit = obj.get('repoObj').head.commit
+        except:
+            #no commits -> no files
+            empty = True
+    else:
         empty = True
         
     if empty:
-        return render_to_response(template, {'empty':True}, context_instance=RequestContext(request))
+        return render_to_response(template, {'slug':slug,'userobj':userobj.username,'empty':True}, context_instance=RequestContext(request))
     
     latest_issues = Issue.objects.filter(repository=obj.get('repo')).order_by('-published')[:5]
-    issues_latest_comments = Issue.objects.filter(repository=obj.get('repo'), last_action__isnull=False).order_by('last_action')[:3]
+    issues_latest_comments = Issue.objects.filter(repository=obj.get('repo'), last_action__isnull=False).order_by('-last_action')[:3]
     comments = []
     
     if issues_latest_comments:
@@ -170,6 +181,7 @@ def team(request, userid, slug):
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
     team = func.getTeam(obj.get('user_obj').username, slug)
+    repo = obj.get('repo')
     
     if request.method == "POST":
         requser = request.POST.get('username','')
@@ -182,12 +194,15 @@ def team(request, userid, slug):
             for u in team:
                 if newuser.username == u.get('user'):
                     return redirect("/%s/%s/team/" % (userid,slug))
-                
+            
+            repo.team.add(newuser)
+            repo.save
             func.addTeamMember(obj.get('reponame'), newuser.username, perm)
             file = "%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame'))
             func.gitAdd(file)
             func.commitChange("Added %s permission for user %s in %s" % (perm,newuser.username, obj.get('reponame')))
             func.pushUpstream()
+            
         return redirect("/%s/%s/team/" % (userid,slug))
         
     elif request.method == "GET":
@@ -231,6 +246,8 @@ def deletepermission(request, userid, slug):
     
     a = func.delTeamMember(obj.get('reponame'), user_obj.username)
     if a:
+        repo = obj.get('repo')
+        repo.team.remove(user_obj)
         func.gitAdd("%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame')))
         func.commitChange("Deleted permissions in %s for user %s" %(obj.get('reponame'), user_obj.username))
         func.pushUpstream()
@@ -314,4 +331,23 @@ def diff(request,userid,slug,sha1,sha2):
     
 def index(request):
     template = "repocontrol/index.html"
+    commitscomments = CommitComment.objects.filter(repository__private=False).order_by('-date')[:3]
+    newrepos = Repository.objects.all().order_by('-created')[:3]
+    issues = Issue.objects.all().order_by('-published')[:3]
     
+    myrepos_commitscomments = None
+    myrepos_issues = None
+    myrepos_issues_comments = None
+    myrepos_new = None
+    if request.user.is_authenticated():
+        myrepos_commitscomments = CommitComment.objects.filter(repository__user=request.user).order_by('-date')[:3]
+        myrepos_issues = Issue.objects.filter(repository__user=request.user).order_by('-published')[:3]
+        myrepos_issues_comments = IssueComment.objects.filter(issue__repository__user=request.user).order_by('-date')[:3]
+        myrepos_new = Repository.objects.filter(user=request.user).order_by('-created')
+        
+        teamrepos = User.objects.get(username=request.user).repository_collabolators.order_by('-created')
+        teamrepos_commits = CommitComment.objects.filter(repository__in=teamrepos).order_by('-date')[:3]
+        teamrepos_issues = Issue.objects.filter(repository__in=teamrepos).order_by('-published')[:3]
+        
+    return render_to_response(template, {'teamrepos_issues':teamrepos_issues,'teamrepos_commits':teamrepos_commits,'teamrepos':teamrepos,'myrepos_new':myrepos_new,'myrepos_commitscomments':myrepos_commitscomments,'myrepos_issues':myrepos_issues,'myrepos_issues_comments':myrepos_issues_comments,'commitscomments':commitscomments, 'newrepos':newrepos, 'issues':issues}, context_instance=RequestContext(request))
+

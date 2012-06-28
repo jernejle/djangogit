@@ -1,0 +1,32 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenuindex.html" %}
+{% endblock %}
+{% block content %}
+{% if user %}
+<table id="userprofile" class="table table-bordered">
+	<tbody>
+		<tr>
+			<th>First name</th>
+			<td>{{ user.first_name }}</td>
+		</tr>
+		<tr>
+			<th>Last name</th>
+			<td>{{ user.last_name }}</td>
+		</tr>
+		<tr>
+			<th>Username</th>
+			<td>{{ user.username }}</td>
+		</tr>
+		<tr>
+			<th>Email</th>
+			<td>{{ user.email }}</td>
+		</tr>
+		<tr>
+			<th>Number of repositories</th>
+			<td>{{ numberofrepos }}</td>
+		</tr>
+	</tbody>
+</table>
+{% endif %}
+{% endblock %}

@@ -10,6 +10,7 @@ class Repository(models.Model):
     private = models.BooleanField(blank=True)
     created = models.DateTimeField(blank=True)
     user = models.ForeignKey(User, blank=True, null=True)
+    team = models.ManyToManyField(User, related_name="repository_collabolators", blank=True, null=True)
 
     def __unicode__(self):
         return "%s - %s" % (self.name, self.slug)

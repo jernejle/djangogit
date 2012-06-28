@@ -4,7 +4,9 @@
 {% endblock %}
 {% block content %}
 {% if empty %}
-push files first
+<div class="alert alert-success">
+	<strong>Repository was successfully created.</strong> Please push your files first to <strong>git@localhost:{{ user }}/{{ slug }}</strong>
+</div>
 {% else %}
 <div class="reponame">
 	<b>{{ reponame }}</b>

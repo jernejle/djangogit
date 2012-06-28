@@ -177,6 +177,7 @@ h2 {
 }
 
 .news {
+	overflow: hidden;
 	margin-top: 30px;
 	font-size: 12px;
 	color: #333;
@@ -441,4 +442,43 @@ hr {
 
 .timenews {
 	float: right;
+}
+
+#yourrepos {
+	float: left;
+	width: 270px;
+	padding-right: 13px;
+	border-right: 1px solid #DDDDDD;
+}
+
+#reponews {
+	float: right;
+	width: 580px;
+}
+
+.firstpage {
+	overflow: hidden;
+	margin-top: 30px;
+	font-size: 12px;
+	color: #333;
+	padding: 13px;
+	border-radius: 3px;
+	margin-bottom: 50px;
+}
+
+#team {
+	margin-top: 50px;
+}
+
+.indexrow {
+	padding-left: 10px;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+#userprofile {
+	font-size: 12px;
+	width: 500px;
+	margin-left: auto;
+	margin-right: auto;
 }

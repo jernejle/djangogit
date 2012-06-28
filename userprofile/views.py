@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from djangogit import func
+from repocontrol.models import Repository
 from userprofile.models import SSHKey
 import datetime
 
@@ -156,4 +157,7 @@ def deactivatekey(request,keyid):
     return redirect(listkeys)
 
 def viewprofile(request, keyid):
-    pass
+    template = "userprofile/viewprofile.html"
+    user = get_object_or_404(User,pk=keyid)
+    numberofrepos = Repository.objects.filter(user=user).count()
+    return render_to_response(template, {'numberofrepos':numberofrepos,'user':user}, context_instance=RequestContext(request))
