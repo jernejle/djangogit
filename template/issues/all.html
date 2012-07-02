@@ -8,21 +8,22 @@
 	<hr />
 </div>
 
-{% if issues %}
 <div id="issues">
-	{% for issue in issues %}
-	<div class="issue-top">
-		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>{% if issue.deadline %} <span id="deadline">{{ issue.deadline }}</span>{% endif %}
-	</div>
-	<div class="issue-bottom">
-		<b>{{ issue.author }}</b> on {{ issue.published.date }} at {{ issue.published.time }} <span class="issue-type">{{ issue.get_label_display }}</span>
-	</div>
-	{% endfor %}
+	<script type="text/javascript">
+		Dajaxice.issues.getObjectsByTag(Dajax.process, {
+			'userid' : pn[1],
+			'slug' : pn[2],
+			'tag' : "0"
+		});
+	</script>
 </div>
 <div id="issue-menu">
 	<ul class="nav nav-pills nav-stacked">
 		<li class="active" id="0">
 			<a href="#">All</a>
+		</li>
+		<li id="active">
+			<a href="#">Last 24h</a>
 		</li>
 		<li id="open">
 			<a href="#">Open</a>
@@ -41,7 +42,7 @@
 		</li>
 	</ul>
 </div>
-{% endif %}
+
 <script type="text/javascript">
 	var tempid = "0";
 	$(document).ready(function() {

@@ -4,6 +4,11 @@
 			<li {% if not activelink %} class="active" {% endif %}>
 				<a href="/">Home</a>
 			</li>
+			{% if not user.username %}
+			<li>
+				<a href="/users/register/">Register</a>
+			</li>
+			{% endif %}
 			<li {% if activelink == "addnew" %} class="active" {% endif %}>
 				<a href="/new/">Add new repository</a>
 			</li>

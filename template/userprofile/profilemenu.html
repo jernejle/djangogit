@@ -5,7 +5,7 @@
 				<a href="/">Home</a>
 			</li>
 			<li>
-				<a href="#">View your profile</a>
+				<a href="/users/viewprofile/{{ user.id }}">View your profile</a>
 			</li>
 			<li {% if activelink == "/users/my/" %} class="active" {% endif %}>
 				<a href="/users/my">Edit your profile</a>

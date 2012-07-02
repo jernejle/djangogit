@@ -22,6 +22,7 @@ import json
 @login_required
 def addnewrepo(request):
     template = "repocontrol/addnew.html"
+    message = None
     if request.method == "GET":
         form = NewRepo()
         return render_to_response(template, {'activelink':'addnew','form':form}, context_instance=RequestContext(request))
@@ -32,6 +33,7 @@ def addnewrepo(request):
             object.user = request.user
             object.created = datetime.datetime.now()
             object.save()
+            
             func.addRepo(request.user, object.slug, "RW+")
             message = "Repo %s/%s added" % (request.user, object.slug)
             file = "%s/conf/%s/%s.conf" % (TEMP_REPODIR, request.user, object.slug)
@@ -41,9 +43,8 @@ def addnewrepo(request):
             func.gitAdd(GITOLITE_CONF)
             func.commitChange(message)
             func.pushUpstream()
-            return HttpResponse("added")
-        else:
-            return render_to_response(template, {'activelink':'addnew','form':form}, context_instance=RequestContext(request))
+            message = "Your repository was successfully created"
+        return render_to_response(template, {'message':message,'activelink':'addnew','form':form}, context_instance=RequestContext(request))
         
 def viewrepo(request, userid, slug):
     template = "repocontrol/viewrepo.html"
@@ -184,29 +185,45 @@ def team(request, userid, slug):
     repo = obj.get('repo')
     
     if request.method == "POST":
+        if request.user != obj.get('repo').user:
+            return HttpResponse("Only the owner can change user permissions")
+        
         requser = request.POST.get('username','')
         reqperm = request.POST.get('perm','')
         permlist = {'r':'R','rw':'RW','rw+':'RW+'}
         perm = permlist.get(reqperm,'')
-        newuser = get_object_or_404(User,username=requser)
+        
+        if requser != "@all":
+            newuser = get_object_or_404(User,username=requser)
+        else:
+            newuser = "@all"
         
         if perm and newuser:
             for u in team:
-                if newuser.username == u.get('user'):
+                if newuser != "@all" and newuser == u.get('user'):
+                    return redirect("/%s/%s/team/" % (userid,slug))
+                elif newuser == "@all" and newuser == u.get('user'):
                     return redirect("/%s/%s/team/" % (userid,slug))
             
-            repo.team.add(newuser)
-            repo.save
-            func.addTeamMember(obj.get('reponame'), newuser.username, perm)
-            file = "%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame'))
-            func.gitAdd(file)
-            func.commitChange("Added %s permission for user %s in %s" % (perm,newuser.username, obj.get('reponame')))
-            func.pushUpstream()
+            if newuser != "@all":
+                repo.team.add(newuser)
+                repo.save
+                func.addTeamMember(obj.get('reponame'), newuser.username, perm)
+                file = "%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame'))
+                func.gitAdd(file)
+                func.commitChange("Added %s permission for user %s in %s" % (perm,newuser.username, obj.get('reponame')))
+                func.pushUpstream()
+            else:
+                func.addTeamMember(obj.get('reponame'), "@all", perm)
+                file = "%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame'))
+                func.gitAdd(file)
+                func.commitChange("Added %s permission for user %s in %s" % (perm,newuser, obj.get('reponame')))
+                func.pushUpstream()
             
         return redirect("/%s/%s/team/" % (userid,slug))
         
     elif request.method == "GET":
-        return render_to_response(template, {'team':team, 'reponame':obj.get('reponame'), 'activelink':'team', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)} , context_instance=RequestContext(request))
+        return render_to_response(template, {'owner':obj.get('repo').user,'team':team, 'reponame':obj.get('reponame'), 'activelink':'team', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)} , context_instance=RequestContext(request))
     
 def getmembers(request, userid, slug):
     if request.is_ajax():
@@ -237,6 +254,14 @@ def deletepermission(request, userid, slug):
         return HttpResponse("Only the owner can delete user permissions")
     
     requser = request.GET.get('user','')
+    if requser == "@all":
+        a = func.delTeamMember(obj.get('reponame'), "@all")
+        if a:
+            func.gitAdd("%s/conf/%s.conf" % (TEMP_REPODIR, obj.get('reponame')))
+            func.commitChange("Deleted permissions in %s for user %s" %(obj.get('reponame'), "@all"))
+            func.pushUpstream()
+        return redirect("/%s/%s/team/" % (userid,slug))
+    
     user_obj = User.objects.get(username=requser)
     if not requser or not user_obj:
         return redirect("/%s/%s/team/" % (userid,slug))
@@ -266,9 +291,7 @@ def postcomment(request, userid, slug, sha):
             object.sha = sha
             object.repository = obj.get('repo')
             object.save()
-            return HttpResponse("saved")
-        else:
-            return HttpResponse("not")
+        return redirect("/%s/%s/commit/%s" %(userid,slug,sha))
 
 def difflist(request,userid,slug):
     template = "repocontrol/difflist.html"
@@ -332,13 +355,16 @@ def diff(request,userid,slug,sha1,sha2):
 def index(request):
     template = "repocontrol/index.html"
     commitscomments = CommitComment.objects.filter(repository__private=False).order_by('-date')[:3]
-    newrepos = Repository.objects.all().order_by('-created')[:3]
-    issues = Issue.objects.all().order_by('-published')[:3]
+    newrepos = Repository.objects.filter(private=False).order_by('-created')[:3]
+    issues = Issue.objects.filter(repository__private=False).order_by('-published')[:3]
     
     myrepos_commitscomments = None
     myrepos_issues = None
     myrepos_issues_comments = None
     myrepos_new = None
+    teamrepos = None
+    teamrepos_commits = None
+    teamrepos_issues = None
     if request.user.is_authenticated():
         myrepos_commitscomments = CommitComment.objects.filter(repository__user=request.user).order_by('-date')[:3]
         myrepos_issues = Issue.objects.filter(repository__user=request.user).order_by('-published')[:3]
@@ -351,3 +377,32 @@ def index(request):
         
     return render_to_response(template, {'teamrepos_issues':teamrepos_issues,'teamrepos_commits':teamrepos_commits,'teamrepos':teamrepos,'myrepos_new':myrepos_new,'myrepos_commitscomments':myrepos_commitscomments,'myrepos_issues':myrepos_issues,'myrepos_issues_comments':myrepos_issues_comments,'commitscomments':commitscomments, 'newrepos':newrepos, 'issues':issues}, context_instance=RequestContext(request))
 
+def searchrepos(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        repos = Repository.objects.filter(name__icontains = q, private=False)
+        results = []
+        for repo in repos:
+            repo_json = {}
+            repo_json['id'] = repo.id
+            repo_json['label'] = "%s/%s" %(repo.user.username,repo.slug)
+            repo_json['value'] = "%s/%s" %(repo.user.username,repo.slug)
+            results.append(repo_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+def redirectTo(request):
+    if request.method == "POST":
+        q = request.POST.get('searchquery',None)
+        if not q:
+            raise Http404
+        
+        qsplit = q.split('/')
+        repo = get_object_or_404(Repository, slug=qsplit[1], user__username=qsplit[0], private=False)
+        
+        return redirect("/%s/%s/" %(repo.user.id,repo.slug))
+    else:
+        raise Http404

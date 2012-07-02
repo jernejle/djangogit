@@ -3,6 +3,14 @@
 {% include "repocontrol/profilemenuindex.html" %}
 {% endblock %}
 {% block content %}
+{% if message %}
+<div class="alert alert-success">
+	<button type="button" class="close" data-dismiss="alert">
+		×
+	</button>
+	<strong><span style="text-align: center">{{ message }}</span></strong>
+</div>
+{% endif %}
 <div class="medium_box">
 	<div class="well">
 		<div style="color: red; text-align: center">

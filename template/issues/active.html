@@ -9,10 +9,10 @@
 </div>
 
 {% if issues %}
-<div>
+<div style="margin-left: 145px">
 	{% for issue in issues %}
 	<div class="issue-top">
-		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %}<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>
+		{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>{% elif issue.label == "2" %}<i class="icon-leaf"></i>{% elif issue.label == "3" %}<i class="icon-question-sign"></i>{% endif %}&nbsp;<a href="{{ href }}issues/{{ issue.id }}">{{ issue.title }}</a>
 	</div>
 	<div class="issue-bottom">
 		<b>{{ issue.author }}</b> on {{ issue.published.date }} at {{ issue.published.time }} <span class="issue-type">{{ issue.get_label_display }}</span>

@@ -29,7 +29,7 @@
 					'userid' : pn[1],
 					'slug' : pn[2],
 					'sha' : '{{ chosenbranch }}'
-				})
+				});
 				$("#branches").click(function() {
 					window.location = "/"+pn[1]+"/"+pn[2]+"/files/"+$(this).val()
 				});

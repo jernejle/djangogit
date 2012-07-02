@@ -14,6 +14,7 @@ def add(request, userid, slug):
     template = "issues/addnew.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
+    message = None
     
     if request.method == "GET":
         form = NewIssue()
@@ -27,16 +28,14 @@ def add(request, userid, slug):
             issue.open = True
             issue.repository = obj.get('repo')
             issue.save()
-            return HttpResponse("added")
-        else:
-            return render_to_response(template, {'activelink':'add', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'form':form}, context_instance=RequestContext(request))
+            message = "Your issue was added."
+        return render_to_response(template, {'message':message,'activelink':'add', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'form':form}, context_instance=RequestContext(request))
         
 def all(request, userid, slug):
     template = "issues/all.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
-    issues = Issue.objects.filter(repository=obj.get('repo')).order_by('-published')
-    return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'browse'}, context_instance=RequestContext(request))
+    return render_to_response(template, {'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'browse'}, context_instance=RequestContext(request))
 
 def details(request, userid, slug, keyid):
     template = "issues/details.html"
@@ -65,22 +64,13 @@ def postcomment(request,userid,slug,keyid):
         return redirect("/%s/%s/issues/%s/" %(userid,slug,keyid))
     else:
         return redirect("/")
-    
-def active(request,userid,slug):
-    template = "issues/active.html"
-    obj = func.getRepoObjorNone(userid, slug)
-    func.objOr404(obj)
-    now = datetime.datetime.now()
-    yest = datetime.datetime.now() - datetime.timedelta(days=1)
-    issues = Issue.objects.filter(Q(published__year=now.year,published__month=now.month,published__day=now.day) | Q(published__year=yest.year,published__month=yest.month,published__day=yest.day))
-    return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'active'}, context_instance=RequestContext(request))
 
 def changestatus(request,userid,slug,keyid):
     if request.method == "POST":
         obj = func.getRepoObjorNone(userid, slug)
         func.objOr404(obj)
         issue = get_object_or_404(Issue, pk=keyid)
-        if not issue.author == request.user:
+        if not issue.author == request.user and issue.repository.user != request.user:
             return redirect("/")
         
         if issue.open:
@@ -98,6 +88,6 @@ def myissues(request,userid,slug):
     template = "issues/active.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
-    issues = Issue.objects.filter(author=request.user)
+    issues = Issue.objects.filter(author=request.user).order_by('-published')
     return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'my'}, context_instance=RequestContext(request))
     

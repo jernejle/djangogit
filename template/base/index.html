@@ -43,7 +43,13 @@
 				</div>
 			</div>
 			<div id="search">
-				<input id="searchBox" type="text">
+				<form method="post" action="/search/redirect/">
+					<input id="searchBox" name="searchquery" type="text" class="input-medium search-query">
+					<button type="submit" class="btn">
+						Search
+					</button>
+					{% csrf_token %}
+				</form>
 			</div>
 			<div id="header">
 				Django GIT repository browser
@@ -58,5 +64,11 @@
 	</body>
 	<script type="text/javascript">
 		$('.dropdown-toggle').dropdown();
+		$(function() {
+			$("#searchBox").autocomplete({
+				source : "search/",
+				minLength : 2,
+			});
+		});
 	</script>
 </html>

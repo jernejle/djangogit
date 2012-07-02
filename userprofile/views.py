@@ -11,6 +11,7 @@ from userprofile.models import SSHKey
 import datetime
 
 def register(request):
+    message = None
     if request.user.is_authenticated():
         return redirect("/users/my")
     if request.method == "POST":
@@ -19,9 +20,10 @@ def register(request):
             data = form.cleaned_data
             user = User.objects.create_user(data.get('username'), data.get('email'), data.get('password'))
             user.save()
+            message = "Your account has been created!"
     elif request.method == "GET":
         form = UserForm()
-    return render_to_response('userprofile/register.html', {'form': form}, context_instance=RequestContext(request))
+    return render_to_response('userprofile/register.html', {'message':message,'form': form}, context_instance=RequestContext(request))
 
 def login(request):
     if request.user.is_authenticated():

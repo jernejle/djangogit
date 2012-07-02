@@ -12,7 +12,7 @@
 	<b>{{ reponame }}</b>
 </div>
 <div class="repobox">
-	{{ repodb.description }}
+	{{ repodb.description|linebreaks }}
 </div>
 <div class="repobox">
 	<button class="btn" href="#">
@@ -40,18 +40,16 @@
 	{{ latest_commit.message}}
 </div>
 <div class="latest-commit-bottom">
-	<b>{{ latest_commit.author }}</b> on {{ date.date }} at {{ date.time }} <span class="commit-sha">{{ latest_commit.hexsha }}</span>
+	<b>{{ latest_commit.author }}</b> on {{ date.date }} at {{ date.time }} <span class="commit-sha"><a href="{{ href }}commit/{{ latest_commit.hexsha }}/">{{ latest_commit.hexsha }}</a></span>
 </div>
+	{% if latest_issues or issues_latest_comments %}
 <div class="news">
-	{% if latest_issues %}
 	{% for issue in latest_issues %}
 	<div class="news-small">
 		{% if issue.label == "1" %}<i class="icon-exclamation-sign"></i>{% elif issue.label == "2" %}<i class="icon-leaf"></i>{% elif issue.label == "3" %} <i class="icon-question-sign"></i> {% endif %} <a href="/users/viewprofile/{{ issue.author.id }}/">{{ issue.author.username }}</a> oppened new <a href="{{ href }}issues/{{ issue.id }}/">issue</a><span class="timenews">{{ issue.published.date }} at {{ issue.published.time }}</span>
 	</div>
 	{% endfor %}
-	{% endif %}
 	<hr />
-	{% if issues_latest_comments %}
 	{% for c in issues_latest_comments %}
 		{% for a in c %}
 	<div class="news-small">

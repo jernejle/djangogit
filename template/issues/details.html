@@ -9,14 +9,14 @@
 </div>
 <br />
 <div class="issuetitle">
-	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% endif %} {{ issue.title }}
+	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>[BUG]{% elif issue.label == "2" %}<i class="icon-leaf"></i>[Enhacement]{% elif issue.label == "3" %}<i class="icon-question-sign"></i>[QUESTION]{% endif %}&nbsp;{{ issue.title }}
 </div>
 <br />
 <div class="detail-issue-top">
-	<b>{{ issue.author }}</b><i> on {{ issue.published.date }} at {{ issue.published.time }}</i>
+	{{ issue.content|linebreaks }}
 </div>
 <div class="detail-issue-bottom">
-	{{ issue.content|linebreaks }}
+	<b>{{ issue.author }}</b><i> on {{ issue.published.date }} at {{ issue.published.time }}</i>
 </div>
 {% if comments %}
 {% for comment in comments %}
@@ -29,7 +29,7 @@
 {% endfor %}
 {% endif %}
 
-{% if issue.author.username == user.username %}
+{% if issue.author.username == user.username or issue.repository.user.username == user.username %}
 <div id="closeopen">
 	<form method="post" name="submit" action="{{ href }}issues/{{ issue.id }}/status/">
 		<button type="submit" class="btn btn-primary">
@@ -44,7 +44,7 @@
 </div>
 {% endif %}
 
-{% if user.username and issue.open or user.username == issue.author.username %}
+{% if user.username and issue.open or user.username == issue.author.username or issue.repository.user.username == user.username %}
 <div id="write-issue-comment">
 	<form action="{{ href }}issues/{{ issue.id }}/post/" method="post">
 		<div class="control-group">
@@ -57,7 +57,7 @@
 		</div>
 		<div class="formactions">
 			<button type="submit" class="btn btn-primary">
-				Add new issue
+				Comment
 			</button>
 		</div>
 		{% csrf_token %}

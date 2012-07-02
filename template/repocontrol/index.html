@@ -17,23 +17,28 @@
 					<a href="/{{ repo.user.id }}/{{ repo.slug }}/"><i class="icon-book"></i>&nbsp;{{ repo.user }}/{{ repo.slug }}</a>
 				</li>
 				{% endfor %}
+				{% else %}
+				<li>
+					<a href="/new">Create new</a>
+				</li>
 				{% endif %}
 			</ul>
 		</div>
 
+		{% if teamrepos %}
 		<div id="team">
 			<ul class="nav nav-tabs nav-stacked">
 				<li class="active" style="text-align: center">
 					<a href="#"><h4>Team</h4></a>
-					{% if teamrepos %}
+
 					{% for repo in teamrepos %}
 				<li>
 					<a href="/{{ repo.user.id }}/{{ repo.slug }}/"><i class="icon-book"></i>&nbsp;{{ repo.user }}/{{ repo.slug }}</a>
 				</li>
 				{% endfor %}
-				{% endif %}
 			</ul>
 		</div>
+		{% endif %}
 	</div>
 	<div id="reponews">
 		<div class="tabbable" style="margin-bottom: 18px;">
@@ -41,12 +46,14 @@
 				<li class="active">
 					<a href="#tab1" data-toggle="tab">All news</a>
 				</li>
+				{% if user.username %}
 				<li class="">
 					<a href="#tab2" data-toggle="tab">My repositories</a>
 				</li>
 				<li class="">
 					<a href="#tab3" data-toggle="tab">Team repositories</a>
 				</li>
+				{% endif %}
 			</ul>
 			<div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
 				<div class="tab-pane active" id="tab1">

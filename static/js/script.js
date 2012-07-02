@@ -48,7 +48,14 @@ function postIssue(data) {
 				if (!data[i].open) {
 					var top = "<div class='issue-top'><i class='icon-lock'></i> <a href='/" + data[i].href + "'>" + data[i].title + "</a></div>"
 				} else {
-					var top = "<div class='issue-top'><a href='/" + data[i].href + "'>" + data[i].title + "</a></div>"
+					if (data[i].label == "Bug") {
+						la = "<i class='icon-exclamation-sign'></i>"
+					} else if (data[i].label == "Question") {
+						la = "<i class='icon-question-sign'></i>"
+					} else if (data[i].label == "Enhancement") {
+						la = "<i class='icon-leaf'></i>"
+					}
+					var top = "<div class='issue-top'>"+la +"&nbsp;<a href='/" + data[i].href + "'>" + data[i].title + "</a></div>"
 				}
 				var bottom = "<div class='issue-bottom'><b>" + data[i].author + "</b> on " + datespl[0] + " at " + timespl[0].substr(0, 5) + " <span class='issue-type'>" + data[i].label + "</span></div>"
 				$("#issues").append(top)

@@ -78,10 +78,12 @@ def addRepo(username, reponame, perm):
         os.makedirs(dir)
     conf = "%s/%s.conf" % (dir, reponame)
     file = open(conf, 'w')
-    repowrite = "repo %s/%s" % (username, reponame) 
+    repowrite = "repo %s/%s \n" % (username, reponame) 
     permwrite = "    %s    =    %s" % (perm, username)
     file.write(repowrite)
     file.write(permwrite)
+    pubview = "\n    R    =    @all"
+    file.write(pubview)
     file.close()
 
 def appendToGitoliteConf(file, line):
