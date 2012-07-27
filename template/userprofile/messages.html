@@ -1,0 +1,41 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "userprofile/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+{% if user %}
+<h3>Messages</h3>
+<hr />
+{% if messages %}
+<div id="messagestab">
+	{% for message in messages %}
+	<div id="message{{ message.id }}" class="{% if message.read %} message_read {% else %} messbox {% endif %}">
+
+		{% if message.read %}<i class="icon-check"></i>{% else %}<i class="icon-envelope"></i>{% endif %}&nbsp;<b>{{ message.title }}</b><span style="float: right">{{ message.datetime.time }} {{ message.datetime.date }}</span> {% if not message.read  %} &nbsp;<span id="read{{ message.id }}"><i class="icon-ok"></i>&nbsp;<span class="mess_href" id="{{ message.id }}">Read</span></span>{% endif %}
+		<br />
+		{% autoescape off %} {{ message.content }}  {% endautoescape %}<span style="float: right"><span id="{{ message.id }}" class="delete"><i class="icon-remove"></i>&nbsp;Delete</span></span>
+	</div>
+	{% endfor %}
+</div>
+<script type="text/javascript">
+	$(".mess_href").click(function() {
+		Dajaxice.userprofile.read_message(Dajax.process, {
+			'messageid':$(this).attr('id')
+		});
+		$("#message"+ $(this).attr('id')).removeClass().addClass("message_read")
+		$("#message"+ $(this).attr('id')).find("i").removeClass().addClass("icon-check")
+		$("#read"+ $(this).attr('id')).remove()
+	}); 
+	
+	$(".delete").click(function() {
+		Dajaxice.userprofile.del_message(Dajax.process, {
+			'messageid':$(this).attr('id')
+		});
+		$("#message"+ $(this).attr('id')).remove()
+	});
+</script>
+{% else %}
+No messages
+{% endif %}
+{% endif %}
+{% endblock %}

@@ -6,6 +6,7 @@ from issues.forms import NewIssue, NewComment
 from django.contrib.auth.decorators import login_required
 from issues.models import Issue, IssueComment
 from django.db.models import Q
+from userprofile.models import Message
 import pdb
 import datetime
 
@@ -29,6 +30,19 @@ def add(request, userid, slug):
             issue.repository = obj.get('repo')
             issue.save()
             message = "Your issue was added."
+            team_members = obj.get('repo').team.all()
+            
+            mess = "User user#%s posted new issue in repo#%s" % (request.user, obj.get('reponame'))
+            title = "New issue in %s" % (obj.get('reponame'))
+            now = datetime.datetime.now()
+            
+            if request.user != obj.get('repo').user:
+                Message.objects.create(title=title, content=mess, datetime=now, user=obj.get('repo').user, read=False)
+
+            for member in team_members:
+                if request.user != member:
+                    Message.objects.create(title=title, content=mess, datetime=now, user=member, read=False)
+            
         return render_to_response(template, {'message':message,'activelink':'add', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'form':form}, context_instance=RequestContext(request))
         
 def all(request, userid, slug):
@@ -61,6 +75,26 @@ def postcomment(request,userid,slug,keyid):
             issue.save()
             comment.issue = issue
             comment.save()
+            
+            comments = IssueComment.objects.filter(issue=issue)
+            users = []
+            mess = "User user#%s posted new comment in repo#%s" % (request.user, obj.get('reponame'))
+            title = "New comment on issue %s in %s" % (issue.title,obj.get('reponame'))
+            now = datetime.datetime.now()
+            for comment in comments:
+                if comment.author == request.user:
+                    continue
+                
+                if comment.author not in users:
+                    users.append(comment.author)
+                    Message.objects.create(title=title, content=mess, datetime=now, user=comment.author, read=False)
+            
+            if obj.get('repo').user not in users and obj.get('repo').user != request.user:
+                Message.objects.create(title=title, content=mess, datetime=now, user=obj.get('repo').user, read=False)
+            
+            if issue.author not in users and issue.author != request.user:
+                Message.objects.create(title=title, content=mess, datetime=now, user=issue.author, read=False)
+            
         return redirect("/%s/%s/issues/%s/" %(userid,slug,keyid))
     else:
         return redirect("/")
@@ -88,6 +122,6 @@ def myissues(request,userid,slug):
     template = "issues/active.html"
     obj = func.getRepoObjorNone(userid, slug)
     func.objOr404(obj)
-    issues = Issue.objects.filter(author=request.user).order_by('-published')
+    issues = Issue.objects.filter(author=request.user, repository=obj.get('repo')).order_by('-published')
     return render_to_response(template, {'issues':issues, 'reponame':obj.get('reponame'), 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':'my'}, context_instance=RequestContext(request))
     

@@ -112,7 +112,7 @@ def getRepoObjorNone(userid, slug):
         repo = Repository.objects.get(user=user_obj, slug=slug)
     except ObjectDoesNotExist:
         return None
-    reponame = "%s/%s" % (user_obj, repo.slug)
+    reponame = "%s/%s" % (user_obj.username, repo.slug)
     repoObj = getRepoObject(reponame)
     if not repoObj:
         return None
@@ -241,3 +241,13 @@ def delTeamMember(reponame,user):
             return False
     else:
         return False
+    
+def getDate(datetimeObj):
+    today = datetime.datetime.now()
+    yesterday = today - datetime.timedelta(days=1)
+    if datetimeObj.date() == today.date():
+        return "Today at %s" %datetimeObj.strftime("%H:%M")
+    elif datetimeObj.date() == yesterday.date():
+        return "Yesterday at %s" %datetimeObj.strftime("%H:%M")
+    else:
+        return datetimeObj.strftime("%H:%M %B %d, %Y")

@@ -1,7 +1,7 @@
 {% load dajaxice_templatetags %}
 <html lang="en">
 	<head>
-		<title>{% block title %}Django GIT repository browser{% endblock %}</title>
+		<title>{% block title %}Django GIT source code hosting {% endblock %}</title>
 		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
 		<link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
 		<link href="{{ STATIC_URL }}css/style.css" rel="stylesheet">
@@ -26,6 +26,9 @@
 					<ul class="dropdown-menu">
 						<li>
 							<a href="/users/my/">Profile</a>
+						</li>
+						<li>
+							<a href="/users/my/messages/">Messages</a>
 						</li>
 						<li class="divider"></li>
 						<li>
@@ -52,7 +55,7 @@
 				</form>
 			</div>
 			<div id="header">
-				Django GIT repository browser
+				<a href="/">Django GIT source code hosting</a>
 			</div>
 		</div>
 		<div class="container">
@@ -66,7 +69,7 @@
 		$('.dropdown-toggle').dropdown();
 		$(function() {
 			$("#searchBox").autocomplete({
-				source : "search/",
+				source : "/search/",
 				minLength : 2,
 			});
 		});

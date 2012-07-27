@@ -8,7 +8,9 @@ from django.contrib.auth.decorators import login_required
 from djangogit import func
 from repocontrol.models import Repository
 from userprofile.models import SSHKey
+from userprofile.models import Message
 import datetime
+import re
 
 def register(request):
     message = None
@@ -163,3 +165,25 @@ def viewprofile(request, keyid):
     user = get_object_or_404(User,pk=keyid)
     numberofrepos = Repository.objects.filter(user=user).count()
     return render_to_response(template, {'numberofrepos':numberofrepos,'user':user}, context_instance=RequestContext(request))
+
+@login_required
+def messages(request):
+    template = "userprofile/messages.html"
+    messages = Message.objects.filter(user=request.user).order_by('-datetime')
+    messlist = []
+    
+    for message in messages:
+        match = re.search("user#([^\s]+)",message.content)
+        if match:
+            repstr = re.sub("user#([^\s]+)","<a href='/users/viewprofile/%s/'>%s</a>" %(match.group(1),match.group(1)), message.content)
+        match = re.search("repo#([^\s]+)", repstr)
+        if match:
+            repstr = re.sub("repo#([^\s]+)","<a href='/%s/'>%s</a>" %(match.group(1),match.group(1)), repstr)
+        
+        messlist.append({'id':message.id,'title':message.title,'content':repstr,'datetime':message.datetime,'read':message.read})
+    
+    return render_to_response(template, {'messages':messlist, 'activelink':'messages'}, context_instance=RequestContext(request))
+
+def redirect_to_profile(request,username):
+    user = get_object_or_404(User,username=username)
+    return redirect("/users/viewprofile/%d/" % user.id)

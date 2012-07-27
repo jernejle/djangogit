@@ -13,3 +13,14 @@ class SSHKey(models.Model):
     
     def __unicode__(self):
         return "%s@%s" %(self.user.username,self.keyid)
+    
+class Message(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    datetime = models.DateTimeField()
+    user = models.ForeignKey(User)
+    read = models.BooleanField()
+    
+    def __unicode__(self):
+        return self.title
+    
