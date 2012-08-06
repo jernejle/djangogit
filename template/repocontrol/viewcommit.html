@@ -33,7 +33,7 @@
 		</tr>
 		<tr>
 			<th>Parent</th>
-			<td>{% for p in commit.parents %} {{ p }} {% endfor %}</td>
+			<td>{% for p in commit.parents %} <a href="{{ href }}commit/{{ p }}/">{{ p }}</a><br /> {% endfor %}</td>
 		</tr>
 	</tbody>
 </table>
@@ -65,7 +65,8 @@ added
 		{{ comment.comment|linebreaks }}
 	</div>
 	<div class="comment-bottom">
-		<b>{{ comment.author }}</b><i> on {{ comment.date.date }} at {{ comment.date.time }}</i>
+		<i class="icon-user"></i>&nbsp;<b>{{ comment.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ comment.date.time }} {{ comment.date.date }} {% if issue.repository.user.username == user.username or user in team or comment.author ==  user %}
+		 | <a href="{{ href }}commit/{{ commit.sha }}/editcomment/{{ comment.id }}/"><i class="icon-edit"></i>Edit</a> <a href="{{ href }}commit/{{ commit.sha }}/deletecomment/{{ comment.id }}/"><i class="icon-remove"></i>Remove</a>{% endif %}</span>
 	</div>
 	{% endfor %}
 </div>

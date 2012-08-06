@@ -23,3 +23,6 @@ class NewRepo(forms.ModelForm):
 class NewComment(forms.ModelForm):
     class Meta:
         model = CommitComment
+        
+class EditComment(forms.Form):
+    comment = forms.CharField(widget=forms.widgets.Textarea(attrs={'class':'input-xlarge'}))

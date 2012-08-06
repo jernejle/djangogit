@@ -7,16 +7,16 @@
 	<b>{{ reponame }}</b>
 	<hr />
 </div>
+<div class="branches">
+	<select id="branches" name="branch">
+		{% if branches %}
+		{% for branch in branches %}
+		<option value="{{branch}}" {% if branch == chosenbranch %} selected="selected" {% endif %}>{{branch}}</option>
+		{% endfor %}
+		{% endif %}
+	</select>
+</div>
 <div class="files">
-	<div class="branches">
-		<select id="branches" name="branch">
-			{% if branches %}
-				{% for branch in branches %}
-					<option value="{{branch}}" {% if branch == chosenbranch %} selected="selected" {% endif %}>{{branch}}</option>
-				{% endfor %}
-			{% endif %}
-		</select>
-	</div>
 	<table class="table">
 		<thead>
 			<tr>
@@ -31,7 +31,7 @@
 					'sha' : '{{ chosenbranch }}'
 				});
 				$("#branches").click(function() {
-					window.location = "/"+pn[1]+"/"+pn[2]+"/files/"+$(this).val()
+					window.location = "/" + pn[1] + "/" + pn[2] + "/files/" + $(this).val()
 				});
 			</script>
 		</tbody>

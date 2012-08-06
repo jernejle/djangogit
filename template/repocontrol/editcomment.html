@@ -1,0 +1,26 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+<br />
+<b>You are editing</b>
+<div class="comment-top">
+	{{ comment.comment|linebreaks }}
+</div>
+<div class="comment-bottom">
+	<i class="icon-user"></i>&nbsp;<b>{{ comment.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ comment.date.time }} {{ comment.date.date }}</span>
+</div>
+<form method="post" action="{{ href }}commit/{{ comment.sha }}/editcomment/{{ comment.id }}/">
+	{{ form.comment }}
+	<br />
+	<button type="submit" class="btn btn-primary">
+		Edit
+	</button>
+	{% csrf_token %}
+</form>
+{% endblock %}

@@ -6,7 +6,9 @@ from git import *
 from repocontrol.models import CommitComment, Repository
 from issues.models import Issue, IssueComment
 from django.contrib.auth.models import User
+from django.utils.encoding import smart_str, smart_unicode
 import pdb
+import datetime
 
 @dajaxice_register
 def getobjects(request, userid, slug, sha):
@@ -39,14 +41,15 @@ def getBlob(request, userid, slug, sha):
         return
     
     try:
-        blob = func.showBlob(obj.get('repoObj'), sha).replace("\n", "<br />")
+        blob = func.showBlob(obj.get('repoObj'), sha).replace(" ", "&nbsp;").replace("\n", "<br />")
     except:
         blob = None
         
     if not blob:
-        return
+        blob = ""
     
     dajax = Dajax()
+    #pdb.set_trace()
     dajax.add_data(blob, "writeBlob")
     return dajax.json()
 
@@ -165,5 +168,70 @@ def index_news(request):
     newrep = [{'tab':'#tab1', 'author_id':repo.user.id, 'author_username':repo.user.username, 'slug':repo.slug, 'date':func.getDate(repo.created)} for repo in newrepos]
     dajax.add_data(newrep, "newrepos")
     
+    return dajax.json()
+
+@dajaxice_register
+def graphs(request, userid, slug, branch, graph, sk=0):
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    branches = func.getBranches(obj.get('repoObj'))
+
+    dajax = Dajax()
+
+    if branch not in branches:
+        branch = branches[0]
+    
+    skip = int(sk)
+    num = 50
+    commits = list(func.getCommits(obj.get('repoObj'), branch, num, skip))
+    date_val = {}
+    list_values = []
+    
+    
+    if commits:
+        if graph == "commits":
+            for index, c in enumerate(commits):
+                skip = index
+                if len(date_val) >= 5:
+                    break
+                dt = datetime.datetime.fromtimestamp(c.committed_date)
+                
+                temp_val = date_val.get(str(dt.date()))
+                if not temp_val:
+                    date_val[str(dt.date())] = 1
+                else:
+                    temp_val += 1
+                    date_val[str(dt.date())] = temp_val
+        elif graph == "committers":
+            first_date = None
+            last_date = None
+            
+            for index, c in enumerate(commits):
+                skip = index
+                dt = datetime.datetime.fromtimestamp(c.committed_date)
+                if index == 0:
+                    first_date = dt.date()
+                    last_date = first_date - datetime.timedelta(7)
+                
+                if dt.date() >= last_date:
+                    temp_val = date_val.get(smart_str(c.author.name))
+                    
+                    if not temp_val:
+                        date_val[smart_str(c.author.name)] = 1
+                    else:
+                        temp_val += 1
+                        date_val[smart_str(c.author.name)] = temp_val
+                else:
+                    break
+    
+        for item in date_val:
+            if graph == "commits":
+                tmp_dict = {'date':item, 'value':date_val[item], 'sk':skip}
+                list_values.append(tmp_dict)
+            elif graph == "committers":
+                tmp_dict = {'commiter':item, 'value': date_val[item], 'first':str(first_date), 'last':str(last_date), 'sk':skip}
+                list_values.append(tmp_dict)
+
+    dajax.add_data(sorted(list_values), "set_graph_data")
     return dajax.json()
 

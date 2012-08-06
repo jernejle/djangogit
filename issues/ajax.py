@@ -29,6 +29,8 @@ def getObjectsByTag(request,userid,slug,tag):
             now = datetime.datetime.now()
             yest = datetime.datetime.now() - datetime.timedelta(days=1)
             issues = Issue.objects.filter(Q(published__year=now.year,published__month=now.month,published__day=now.day, repository=obj.get('repo')) | Q(published__year=yest.year,published__month=yest.month,published__day=yest.day, repository=obj.get('repo'))).order_by('-published')
+        elif tag == "deadlines":
+            issues = Issue.objects.filter(repository=obj.get('repo'), deadline__isnull=False, open=True).order_by('deadline')
         else:
             issues = Issue.objects.filter(repository=obj.get('repo'), label=int(tag)).order_by('-published')
     except:
@@ -41,7 +43,7 @@ def getObjectsByTag(request,userid,slug,tag):
     if issues:
         for issue in issues:
             href = "%d/%s/issues/%s" % (obj.get('user_obj').id, slug, str(issue.id))
-            list.append({'title':issue.title, 'author':issue.author.username, 'date':str(issue.published), 'href':href, 'open':issue.open, 'label':issue.get_label_display()})
+            list.append({'title':issue.title, 'author':issue.author.username, 'date':str(issue.published), 'deadline':str(issue.deadline),'href':href, 'open':issue.open, 'label':issue.get_label_display()})
     else:
         list = ""
         

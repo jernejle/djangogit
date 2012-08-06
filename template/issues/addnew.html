@@ -52,6 +52,7 @@
 					{{ form.label.errors|striptags }}
 				</div>
 			</div>
+			{% if user == repoadmin or user in team %}
 			<div class="control-group">
 				<label class="control-label" for="focusedInput">Deadline</label>
 				<div class="controls">
@@ -60,6 +61,7 @@
 					{{ form.deadline.errors|striptags }}
 				</div>
 			</div>
+			{% endif %}
 			<div class="formactions">
 				<button type="submit" class="btn btn-primary">
 					Add new issue

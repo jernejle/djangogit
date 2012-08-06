@@ -220,7 +220,7 @@ hr {
 }
 
 .files {
-	margin-top: 30px;
+	margin-top: 50px;
 	color: #333;
 	padding: 13px;
 	background: #FAFAFA;
@@ -351,7 +351,7 @@ hr {
 }
 
 .comment-top {
-	margin-left: 200px;
+	margin-right: 200px;
 	font-size: 13px;
 	padding: 10px;
 	border: 1px solid #C5D5DD;
@@ -361,13 +361,13 @@ hr {
 
 .comment-bottom {
 	margin-top: -5px;
-	margin-left: 200px;
+	margin-right: 200px;
 	margin-bottom: 30px;
 	padding: 2px 2px 2px 10px;
 	background: #F0F0F0;
 	border: 1px solid #C5D5DD;
 	border-radius: 2px;
-	text-align: right;
+	text-align: left;
 }
 
 #deadline {
@@ -502,4 +502,58 @@ hr {
 	padding: 8px;
 	margin-bottom: 20px;
 	font-size: 13px;
+}
+
+#mess-index {
+	float: right;
+	margin: 23px 10px 0 0;
+}
+
+#mess-index a {
+	color: black;
+}
+
+.comment-datetime {
+	float: right;
+	padding-right: 5px;
+}
+
+#changeissuelabel {
+	margin-bottom: 20px;
+	background-color: #EEEEEE;
+	padding: 10px;
+	border: 1px solid #DDD;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+	border-radius: 6px;
+}
+
+.delete-edit-comm {
+	border: 1px solid black;
+}
+
+#graph {
+	border: 1px solid black;
+}
+
+#graphs_f_b {
+	margin-top: 10px;
+	margin-bottom: 100px;
+}
+
+#back_b {
+	float: left;
+}
+
+#forward_b {
+	float: right;
+}
+
+#graphsimages {
+	text-align: center;
+	padding: 30px;
+}
+
+#graphsimages img {
+	margin-left: 50px;	
 }

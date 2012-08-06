@@ -45,6 +45,11 @@
 					{% endif %}
 				</div>
 			</div>
+			{% if user.username %}
+			<div id="mess-index">
+				<a href="/users/my/messages/"><i class="icon-envelope"></i>&nbsp;<span id="messcount">0</span></a>
+			</div>
+			{% endif %}
 			<div id="search">
 				<form method="post" action="/search/redirect/">
 					<input id="searchBox" name="searchquery" type="text" class="input-medium search-query">
@@ -72,6 +77,7 @@
 				source : "/search/",
 				minLength : 2,
 			});
+			Dajaxice.userprofile.checkmessages(Dajax.process);
 		});
 	</script>
 </html>

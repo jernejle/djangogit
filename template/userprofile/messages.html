@@ -23,7 +23,7 @@
 			'messageid':$(this).attr('id')
 		});
 		$("#message"+ $(this).attr('id')).removeClass().addClass("message_read")
-		$("#message"+ $(this).attr('id')).find("i").removeClass().addClass("icon-check")
+		$("#message"+ $(this).attr('id')).find("i")[0].removeClass().addClass("icon-check")
 		$("#read"+ $(this).attr('id')).remove()
 	}); 
 	

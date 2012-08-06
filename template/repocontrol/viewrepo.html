@@ -15,17 +15,14 @@
 	{{ repodb.description|linebreaks }}
 </div>
 <div class="repobox">
-	<button class="btn" href="#">
+	<button id="downloadrepo" class="btn" href="#">
 		Download
 	</button>
-	<button class="btn" href="#">
-		Clone
-	</button>
 	<input type="text" name="repourl" value="git@localhost:{{ reponame }}.git" />
-	<button class="btn" href="#">
+	<button id="newiss" class="btn" href="#">
 		New issue
 	</button>
-	<button class="btn" href="#">
+	<button id="collab" class="btn" href="#">
 		Collaborators
 	</button>
 </div>
@@ -33,7 +30,8 @@
 	Latest news
 	<hr />
 </div>
-<span style="font-size: 10px">Latest commit on master branch</span>
+{% if latest_commit %}
+<span style="font-size: 10px">Latest commit on {{ latest_commit_ref }} branch</span>
 <br />
 <div class="latest-commit-top">
 	<i class="icon-info-sign"></i>
@@ -42,6 +40,7 @@
 <div class="latest-commit-bottom">
 	<b>{{ latest_commit.author }}</b> on {{ date.date }} at {{ date.time }} <span class="commit-sha"><a href="{{ href }}commit/{{ latest_commit.hexsha }}/">{{ latest_commit.hexsha }}</a></span>
 </div>
+{% endif %}
 	{% if latest_issues or issues_latest_comments %}
 <div class="news">
 	{% for issue in latest_issues %}
@@ -60,4 +59,15 @@
 	{% endif %}
 </div>
 {% endif %}
+<script type="text/javascript">
+	$("#collab").click(function() {
+		window.location = "{{ href }}team/"
+	});
+	$("#newiss").click(function() {
+		window.location = "{{ href }}issues/add/"
+	});
+	$("#downloadrepo").click(function() {
+		window.location = "{{ href }}download/"
+	});
+</script>
 {% endblock %}

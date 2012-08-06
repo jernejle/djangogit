@@ -2,8 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from repocontrol.forms import NewRepo, NewComment
-from djangogit.settings import TEMP_REPODIR, GITOLITE_CONF
+from repocontrol.forms import NewRepo, NewComment, EditComment
+from djangogit.settings import TEMP_REPODIR, GITOLITE_CONF, TEMP_CLONE_DIR
 from repocontrol.models import Repository, CommitComment
 from django.contrib.auth.models import User
 from djangogit import func
@@ -15,10 +15,12 @@ from django.http import Http404
 from django.utils.encoding import smart_str, smart_unicode
 from issues.models import Issue, IssueComment
 from userprofile.models import Message
+from django.core.servers.basehttp import FileWrapper
 import datetime
 import re
 import pdb
 import json
+import os
 
 @login_required
 def addnewrepo(request):
@@ -58,15 +60,23 @@ def viewrepo(request, userid, slug):
     except:
         repo = None
     
+    comm_date = None
+    latest_commit = None
+    latest_commit_ref = None
+    
+    branches = func.getBranches(obj.get('repoObj'))
+    if not branches:
+        empty = True
+    
     if not repo:
         raise Http404
     elif repo and obj:  
         try:
-            comm_date = datetime.datetime.fromtimestamp(obj.get('repoObj').head.commit.committed_date)
-            latest_commit = obj.get('repoObj').head.commit
+            comm_date = datetime.datetime.fromtimestamp(obj.get('repoObj').commit().committed_date)
+            latest_commit = obj.get('repoObj').commit()
+            latest_commit_ref = str(obj.get('repoObj').head.ref)
         except:
-            #no commits -> no files
-            empty = True
+            pass
     else:
         empty = True
         
@@ -82,7 +92,7 @@ def viewrepo(request, userid, slug):
             com = li.issuecomment_set.all().order_by('-date')[:2]
             comments.append(com)
 
-    return render_to_response(template, {'issues_latest_comments':comments, 'latest_issues':latest_issues, 'reponame':obj.get('reponame'), 'repodb':obj.get('repo'), 'latest_commit':latest_commit, 'date':comm_date, 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':''}, context_instance=RequestContext(request))
+    return render_to_response(template, {'latest_commit_ref':latest_commit_ref, 'issues_latest_comments':comments, 'latest_issues':latest_issues, 'reponame':obj.get('reponame'), 'repodb':obj.get('repo'), 'latest_commit':latest_commit, 'date':comm_date, 'href':"/%d/%s/" % (obj.get('user_obj').id, slug), 'activelink':''}, context_instance=RequestContext(request))
     
 def viewfiles(request, userid, slug, branch="master"):
     template = "repocontrol/viewfiles.html"
@@ -175,8 +185,9 @@ def commit(request, userid, slug, sha):
             if line == difflist[-1]:
                 difffiles.append(seperate)
     
+    team = obj.get('repo').team.all()
     commitobj = {'author':smart_str(commit.author), 'date':datetime.datetime.fromtimestamp(commit.committed_date), 'message': smart_str(commit.message), 'tree':commit.tree, 'parents':commit.parents, 'sha':commit.hexsha}
-    return render_to_response(template, {'form':form, 'comments':comments, 'diff':difffiles, 'commit':commitobj, 'reponame':obj.get('reponame'), 'activelink':'viewcommits', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+    return render_to_response(template, {'team':team, 'form':form, 'comments':comments, 'diff':difffiles, 'commit':commitobj, 'reponame':obj.get('reponame'), 'activelink':'viewcommits', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
 
 def team(request, userid, slug):
     template = "repocontrol/team.html"
@@ -403,7 +414,74 @@ def redirectTo(request):
     else:
         raise Http404
 
-def redirect_to_repo(request,username,slug):
-    user = get_object_or_404(User,username=username)
-    repo = get_object_or_404(Repository,user__id=user.id,slug=slug)
-    return redirect("/%d/%s" %(user.id,repo.slug))
+def redirect_to_repo(request, username, slug):
+    user = get_object_or_404(User, username=username)
+    repo = get_object_or_404(Repository, user__id=user.id, slug=slug)
+    return redirect("/%d/%s" % (user.id, repo.slug))
+
+def editcomment(request, userid, slug, sha, commentid):
+    template = "repocontrol/editcomment.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    comment = get_object_or_404(CommitComment, pk=commentid)
+    
+    team = obj.get('repo').team.all()
+    if not comment.repository.user == request.user and not request.user in team and not comment.author == request.user:
+        return redirect("/")
+    
+    if request.method == "GET":
+        form = EditComment({'comment':comment.comment})
+        return render_to_response(template, {'form':form, 'comment':comment, 'reponame':obj.get('reponame'), 'activelink':'viewcommits', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)} , context_instance=RequestContext(request))
+    elif request.method == "POST":
+        new_comm = request.POST.get('comment', '')
+        if new_comm:
+            comment.comment = new_comm
+            comment.save()
+        return redirect("/%s/%s/commit/%s/" % (userid, slug, comment.sha))
+
+def deletecomment(request, userid, slug, sha, commentid):
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    comment = get_object_or_404(CommitComment, pk=commentid)
+    
+    team = obj.get('repo').team.all()
+    if not comment.repository.user == request.user and not request.user in team and not comment.author == request.user:
+        return redirect("/")
+    
+    comment.delete()
+    return redirect("/%s/%s/commit/%s/" % (userid, slug, comment.sha))
+
+def graphs(request, userid, slug):
+    template = "repocontrol/graphs.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+        
+    return render_to_response(template, {'reponame':obj.get('reponame') , 'activelink':'graphs', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+
+def commits_history(request, userid, slug):
+    template = "repocontrol/graphs_commit_history.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    branches = func.getBranches(obj.get('repoObj'))
+        
+    return render_to_response(template, {'branches':branches,'reponame':obj.get('reponame') , 'activelink':'graphs', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+
+def committers_history(request, userid, slug):
+    template = "repocontrol/graphs_history_bycommiters.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    branches = func.getBranches(obj.get('repoObj'))
+    
+    return render_to_response(template, {'branches':branches,'reponame':obj.get('reponame') , 'activelink':'graphs', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+
+def download(request,userid,slug):
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    func.cloneRepo(obj.get('reponame'))
+    func.addToZip(TEMP_CLONE_DIR +"/"+obj.get('repo').slug + ".zip", TEMP_CLONE_DIR +"/"+obj.get('reponame')+"/", obj.get('reponame'))
+    
+    filename = TEMP_CLONE_DIR + "/" + obj.get('repo').slug + ".zip"                        
+    wrapper = FileWrapper(file(filename))
+    response = HttpResponse(wrapper, content_type='text/plain')
+    response['Content-Length'] = os.path.getsize(filename)
+    return response

@@ -1,0 +1,32 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "issues/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+<br />
+<div class="issuetitle">
+	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>[BUG]{% elif issue.label == "2" %}<i class="icon-leaf"></i>[Enhacement]{% elif issue.label == "3" %}<i class="icon-question-sign"></i>[QUESTION]{% endif %}&nbsp;{{ issue.title }}
+</div>
+<br />
+<b>You are editing</b>
+<div class="detail-issue-top">
+	{{ issue.content|linebreaks }}
+</div>
+<div class="detail-issue-bottom">
+	<i class="icon-user"></i>&nbsp;<b>{{ issue.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ issue.published.time }} {{ issue.published.date }}
+		{% if issue.repository.user.username == user.username or user in team %}
+		 | <a href="{{ href }}issues/{{ issue.id }}/edit/"><i class="icon-edit"></i>Edit</a> <a href="{{ href }}issues/{{ issue.id }}/remove/"><i class="icon-remove"></i>Remove</a>{% endif %}</span>
+</div>
+<form method="post" action="{{ href }}issues/{{ issue.id }}/edit/">
+	{{ form.content }}
+	<br />
+	<button type="submit" class="btn btn-primary">
+		Edit
+	</button>
+	{% csrf_token %}
+</form>
+{% endblock %}

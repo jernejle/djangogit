@@ -29,3 +29,13 @@ def del_message(request,messageid):
     if message:
         message.delete()
     return dajax.json()
+
+@dajaxice_register
+def checkmessages(request):
+    if not request.user.is_authenticated():
+        return
+    
+    dajax = Dajax()
+    unread = Message.objects.filter(user=request.user,read=False).count()
+    dajax.assign("#messcount", "innerHTML", unread)
+    return dajax.json()

@@ -1,0 +1,37 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "issues/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+<br />
+<div class="issuetitle">
+	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>[BUG]{% elif issue.label == "2" %}<i class="icon-leaf"></i>[Enhacement]{% elif issue.label == "3" %}<i class="icon-question-sign"></i>[QUESTION]{% endif %}&nbsp;{{ issue.title }}
+</div>
+<br />
+<div class="detail-issue-top">
+	{{ issue.content|linebreaks }}
+</div>
+<div class="detail-issue-bottom">
+	<i class="icon-user"></i>&nbsp;<b>{{ issue.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ issue.published.time }} {{ issue.published.date }}</span>
+</div>
+<hr />
+<b>You are editing</b>
+<div class="comment-top">
+	{{ comment.comment }}
+</div>
+<div class="comment-bottom">
+	<i class="icon-user"></i>&nbsp;<b>{{ comment.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ comment.date.time }} {{ comment.date.date }}</span>
+</div>
+<form method="post" action="{{ href }}issues/{{ issue.id }}/editcomment/{{ comment.id }}/">
+	{{ form.comment }}
+	<br />
+	<button type="submit" class="btn btn-primary">
+		Edit
+	</button>
+	{% csrf_token %}
+</form>
+{% endblock %}

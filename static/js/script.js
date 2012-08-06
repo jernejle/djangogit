@@ -7,7 +7,7 @@ function setEvents() {
 			'userid' : pn[1],
 			'slug' : pn[2],
 			'sha' : $(this).attr('id')
-		})
+		});
 	});
 	$(".blob").click(function() {
 		$(".table").remove()
@@ -20,7 +20,13 @@ function setEvents() {
 }
 
 function writeBlob(data) {
-	$(".files").html(data)
+	if (data != "") {
+		var inhtml = "<pre class='linenums'><code>" + data + "</code></pre>"
+		$(".files").html(inhtml)
+		styleCode()
+	} else {
+		$(".files").remove()
+	}
 }
 
 function test(data) {
@@ -45,8 +51,13 @@ function postIssue(data) {
 			for (var i = 0; i < data.length; i++) {
 				var datespl = data[i].date.split(" ")
 				var timespl = datespl[1].split(".")
+				if (data[i].deadline != "None") {
+					deadline = "<span style='float: right'><i class='icon-fire'></i> " + data[i].deadline + "</span>"
+				} else {
+					deadline = ""
+				}
 				if (!data[i].open) {
-					var top = "<div class='issue-top'><i class='icon-lock'></i> <a href='/" + data[i].href + "'>" + data[i].title + "</a></div>"
+					var top = "<div class='issue-top'><i class='icon-lock'></i> <a href='/" + data[i].href + "'>" + data[i].title + "</a>" + deadline +"</div>"
 				} else {
 					if (data[i].label == "Bug") {
 						la = "<i class='icon-exclamation-sign'></i>"
@@ -55,9 +66,15 @@ function postIssue(data) {
 					} else if (data[i].label == "Enhancement") {
 						la = "<i class='icon-leaf'></i>"
 					}
-					var top = "<div class='issue-top'>" + la + "&nbsp;<a href='/" + data[i].href + "'>" + data[i].title + "</a></div>"
+
+					if (data[i].deadline != "None") {
+						deadline = "<span style='float: right'><i class='icon-fire'></i> " + data[i].deadline + "</span>"
+					} else {
+						deadline = ""
+					}
+					var top = "<div class='issue-top'>" + la + "&nbsp;<a href='/" + data[i].href + "'>" + data[i].title + "</a>" + deadline + "</div>"
 				}
-				var bottom = "<div class='issue-bottom'><b>" + data[i].author + "</b> on " + datespl[0] + " at " + timespl[0].substr(0, 5) + " <span class='issue-type'>" + data[i].label + "</span></div>"
+				var bottom = "<div class='issue-bottom'><i class='icon-user'></i>&nbsp;<b>" + data[i].author + "</b> on " + datespl[0] + " at " + timespl[0].substr(0, 5) + " <span class='issue-type'>" + data[i].label + "</span></div>"
 				$("#issues").append(top)
 				$("#issues").append(bottom)
 			}
@@ -99,11 +116,11 @@ function issues(data) {
 
 function issuescomments(data) {
 	$("#spinner").remove()
-	if (data.length > 0) {		
+	if (data.length > 0) {
 		for (var i = 0; i < data.length; i++) {
 			var datespl = data[i].date.split(" ")
 			var timespl = datespl[1].split(".")
-			
+
 			var div = "<div class='indexrow'><i class='icon-comment'></i>&nbsp;<a href='/users/viewprofile/" + data[i].author_id + "/'>" + data[i].author_username + "</a> commented on <a href='/" + data[i].userid + "/" + data[i].slug + "/issues/" + data[i].id + "/'>issue</a> in <a href='/" + data[i].userid + "/" + data[i].slug + "/'>" + data[i].repo_user + "/" + data[i].slug + "</a><span style='float: right'>" + data[i].date + "</span></div>";
 			$(data[i].tab).append(div)
 		}
@@ -116,9 +133,28 @@ function newrepos(data) {
 		for (var i = 0; i < data.length; i++) {
 			var datespl = data[i].date.split(" ")
 			var timespl = datespl[1].split(".")
-			
-			var div = "<div class='indexrow'><i class='icon-book'></i>&nbsp;<a href='/users/viewprofile/"+ data[i].author_id + "/'>" + data[i].author_username  +"</a> created new repository <a href='/"+ data[i].author_id +"/" + data[i].slug + "/'>"+ data[i].author_username  +"/"+ data[i].slug  +"</a><span style='float: right'>" + data[i].date + "</span></div>"
+
+			var div = "<div class='indexrow'><i class='icon-book'></i>&nbsp;<a href='/users/viewprofile/" + data[i].author_id + "/'>" + data[i].author_username + "</a> created new repository <a href='/" + data[i].author_id + "/" + data[i].slug + "/'>" + data[i].author_username + "/" + data[i].slug + "</a><span style='float: right'>" + data[i].date + "</span></div>"
 			$(data[i].tab).append(div)
 		}
+	}
+}
+
+function styleCode() {
+	if ( typeof disableStyleCode != "undefined") {
+		return;
+	}
+
+	var a = false;
+
+	$("pre code").parent().each(function() {
+		if (!$(this).hasClass("prettyprint")) {
+			$(this).addClass("prettyprint");
+			a = true
+		}
+	});
+
+	if (a) {
+		prettyPrint()
 	}
 }

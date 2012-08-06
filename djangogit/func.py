@@ -1,4 +1,4 @@
-from djangogit.settings import TEMP_REPODIR, GITOLITE_ADMIN_REPO, LOG_FILE, REPODIR
+from djangogit.settings import TEMP_REPODIR, GITOLITE_ADMIN_REPO, LOG_FILE, REPODIR, TEMP_CLONE_DIR
 from git import *
 from git import exc
 from django.contrib.auth.models import User
@@ -12,6 +12,7 @@ import shlex, subprocess
 import sys
 import datetime
 import re
+import zipfile
 
 def cloneAdminRepo():
     if not os.path.exists(TEMP_REPODIR):
@@ -123,38 +124,38 @@ def objOr404(obj):
     if not obj:
         raise Http404
 
-def getAllObjects(repo,type,branchorsha):
+def getAllObjects(repo, type, branchorsha):
     repoobject = repo
-    treestr = repoobject.git.execute(["git","ls-tree",branchorsha]).replace("\t"," ").splitlines()
+    treestr = repoobject.git.execute(["git", "ls-tree", branchorsha]).replace("\t", " ").splitlines()
     objects = []
     
     for line in treestr:
-        linesplit = re.split("\s",line)
-        obj = {"perm":linesplit[0],"type":linesplit[1],"sha":linesplit[2],"name":linesplit[3]}
+        linesplit = re.split("\s", line)
+        obj = {"perm":linesplit[0], "type":linesplit[1], "sha":linesplit[2], "name":linesplit[3]}
         objects.append(obj)
     
     if type == "tree":
         typeobjects = [x for x in objects if x["type"] == "tree"]
-    elif type =="blob":
+    elif type == "blob":
         typeobjects = [x for x in objects if x["type"] == "blob"]
     return typeobjects
 
-def showBlob(repo,sha):
+def showBlob(repo, sha):
     repoobject = repo
-    blob = repoobject.git.execute(["git","show",sha])
+    blob = repoobject.git.execute(["git", "show", sha])
     return blob
 
 def getBranches(repo):
     repoobject = repo
-    branches = repoobject.git.execute(["git","branch","-a"]).strip("*").replace(" ", "").splitlines()
+    branches = repoobject.git.execute(["git", "branch", "-a"]).strip("*").replace(" ", "").splitlines()
     return branches
 
-def getCommits(repo,branch,per_page,skip):
+def getCommits(repo, branch, per_page, skip):
     repoobject = repo
-    commits = repoobject.iter_commits(branch,max_count=per_page, skip=skip)
+    commits = repoobject.iter_commits(branch, max_count=per_page, skip=skip)
     return commits
 
-def getTeam(username,slug):
+def getTeam(username, slug):
     repo = initRepo()
     if not repo:
         return None
@@ -173,7 +174,7 @@ def getTeam(username,slug):
     foundrepo = 0
     if stream:
         for line in stream:
-            if re.search("repo .*/.*",line):
+            if re.search("repo .*/.*", line):
                 foundrepo = 1
                 continue
             elif foundrepo == 1:
@@ -199,7 +200,7 @@ def getPermissions(type):
     
     return perm
 
-def addTeamMember(reponame,user,perm):
+def addTeamMember(reponame, user, perm):
     repo = initRepo()
     if not repo:
         return None
@@ -207,11 +208,11 @@ def addTeamMember(reponame,user,perm):
     dir = "%s/conf/%s.conf" % (TEMP_REPODIR, reponame)
     if os.path.exists(dir):
         permwrite = "\n    %s    =    %s" % (perm, user)
-        file = open(dir,"a")
+        file = open(dir, "a")
         file.write(permwrite)
         file.close()
         
-def delTeamMember(reponame,user):
+def delTeamMember(reponame, user):
     repo = initRepo()
     if not repo:
         return False
@@ -225,10 +226,10 @@ def delTeamMember(reponame,user):
             
             for line in old:
                 if line.strip():
-                    if re.search("repo .*/.*",line):
+                    if re.search("repo .*/.*", line):
                         newfile.write(line)
                         continue
-                    if re.search("RW+|RW|R|",line):
+                    if re.search("RW+|RW|R|", line):
                         if user in line:
                             continue
                     newfile.write(line)
@@ -246,8 +247,31 @@ def getDate(datetimeObj):
     today = datetime.datetime.now()
     yesterday = today - datetime.timedelta(days=1)
     if datetimeObj.date() == today.date():
-        return "Today at %s" %datetimeObj.strftime("%H:%M")
+        return "Today at %s" % datetimeObj.strftime("%H:%M")
     elif datetimeObj.date() == yesterday.date():
-        return "Yesterday at %s" %datetimeObj.strftime("%H:%M")
+        return "Yesterday at %s" % datetimeObj.strftime("%H:%M")
     else:
         return datetimeObj.strftime("%H:%M %B %d, %Y")
+    
+def cloneRepo(reponame):
+    clonedrepo_path = TEMP_CLONE_DIR + "/" + reponame
+    if not os.path.exists(TEMP_CLONE_DIR):
+        os.mkdir(TEMP_CLONE_DIR)
+    if not os.path.exists(clonedrepo_path):
+        command = "git clone %s %s" % (REPODIR + "/" + reponame + ".git", TEMP_CLONE_DIR + "/" + reponame)
+        runAndLog(command)
+        
+def addToZip(zippath, toZipPath, reponame):
+    d = toZipPath
+    zf = zipfile.ZipFile(zippath, mode="w")
+    for root, dirs, files in os.walk(d):
+        print "root je " + str(root)
+        print "dirs je " + str(dirs)
+
+        dest_name = root.replace(TEMP_CLONE_DIR + "/%s" %(reponame),'')
+        for file in files:
+                if re.findall("\/\.(.*)", root):
+                        print "dont zip " + file
+                else:
+                        print "zip " + file
+                        zf.write("%s/%s" % (root, file), "%s/%s" % (dest_name, file))

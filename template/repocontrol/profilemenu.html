@@ -15,10 +15,13 @@
 				<a href="{{ href }}commits">Commits</a>
 			</li>
 			<li {% if activelink == "difflist" %} class="active" {% endif %}>
-				<a href="{{ href }}difflist/">Compare diff</a>
+				<a href="{{ href }}difflist/">Compare diffs</a>
 			</li>
 			<li {% if activelink == "/users/my/" %} class="active" {% endif %}>
 				<a href="{{ href }}issues/">Issues</a>
+			</li>
+			<li {% if activelink == "graphs" %} class="active" {% endif %}>
+				<a href="{{ href }}graphs/">Graphs</a>
 			</li>
 			<li {% if activelink == "team" %} class="active" {% endif %}>
 				<a href="{{ href }}team/">Team</a>

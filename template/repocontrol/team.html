@@ -13,7 +13,7 @@
 	<tbody>
 		{% for member in team %}
 		<tr>
-			<th>{{ member.user }}</th>
+			<th><i class="icon-user"></i>&nbsp;{{ member.user }}</th>
 			<td>{{ member.perm }}</td>
 			{% if user.username == owner.username %}
 			<td><a href="{{ href }}delperm/?user={{ member.user }}">Delete</a></td>

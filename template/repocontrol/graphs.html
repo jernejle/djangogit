@@ -1,0 +1,15 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+
+<div id="graphsimages">
+	<a href="{{ href }}graphs/commits-history/"><img src="{{ STATIC_URL }}/img/commits_history.png"></a>
+	<a href="{{ href }}graphs/committers-history/"><img src="{{ STATIC_URL }}/img/committers.png"></a>
+</div>
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+	google.load("visualization", "1", {
+		packages : ["corechart"]
+	});
+
+	var graph_data = []
+	var sk = 0
+
+	function drawChart() {
+		var data = google.visualization.arrayToDataTable(graph_data);
+
+		var options = {
+			title : 'Commit history'
+		};
+
+		var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+		chart.draw(data, options);
+	}
+</script>
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+{% if branches %}
+<div class="branches">
+	<select id="branches" name="branch">
+		{% for branch in branches %}
+		<option value="{{ branch }}">{{ branch }}</option>
+		{% endfor %}
+	</select>
+</div>
+{% endif %}
+
+<script type="text/javascript">
+	Dajaxice.repocontrol.graphs(Dajax.process, {
+		'userid' : pn[1],
+		'slug' : pn[2],
+		'branch' : $("#branches").val(),
+		'graph' : 'commits',
+		'sk' : sk
+	});
+	function set_graph_data(data) {
+		graph_data = []
+		graph_data.push(['Date', 'Commits'])
+
+		sk += data[0].sk
+		for (var i = 0; i < data.length; i++) {
+			graph_data.push([data[i].date, data[i].value])
+		}
+		drawChart()
+	}
+
+	$(function() {
+		$("#forward_b").click(function() {
+			$("#chart_div").empty()
+			Dajaxice.repocontrol.graphs(Dajax.process, {
+				'userid' : pn[1],
+				'slug' : pn[2],
+				'branch' : $("#branches").val(),
+				'graph' : 'commits',
+				'sk' : sk
+			});
+		});
+	}); 
+</script>
+<div id="chart_div" style="margin-top: 40px; width: 900px; height: 500px;"></div>
+<div id="graphs_f_b">
+	<button id="forward_b" class="btn" href="#">
+		Forward
+	</button>
+</div>
+{% endblock %}

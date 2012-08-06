@@ -9,6 +9,7 @@ GITOLITE_CONF = "%s/conf/gitolite.conf" %TEMP_REPODIR
 GITOLITE_ADMIN_REPO = "/srv/git/repositories/gitolite-admin.git"
 REPODIR = "/srv/git/repositories/"
 LOG_FILE = os.path.join(ROOT,"../logs/log")
+TEMP_CLONE_DIR = "/srv/djangogit/temprepo"
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

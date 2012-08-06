@@ -9,27 +9,51 @@
 </div>
 <br />
 <div class="issuetitle">
-	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>[BUG]{% elif issue.label == "2" %}<i class="icon-leaf"></i>[Enhacement]{% elif issue.label == "3" %}<i class="icon-question-sign"></i>[QUESTION]{% endif %}&nbsp;{{ issue.title }}
+	{% if not issue.open %} <i class="icon-lock"></i>&nbsp;{% elif issue.label == "1" %}<i class="icon-exclamation-sign"></i>{% elif issue.label == "2" %}<i class="icon-leaf"></i>{% elif issue.label == "3" %}<i class="icon-question-sign"></i>{% endif %}[{{ issue.get_label_display}}]&nbsp;{{ issue.title }}
+	{% if issue.deadline %}
+	<br /><i class="icon-fire"></i> {{ issue.deadline }}
+	{% endif %}
 </div>
 <br />
+{% if issue.repository.user.username == user.username or user in team %}
+<div class="input-append" id="changeissuelabel">
+	<form style="float: left; margin-right: 10px" method="post" action="{{ href }}issues/{{ issue.id }}/changelabel/">
+		{{ changelabel.title }}&nbsp;{{ changelabel.label }}&nbsp;{{ changelabel.deadline }}
+		<button type="submit" class="btn btn-primary">
+			Change
+		</button>
+		{% csrf_token %}
+	</form>
+	<form class="input-append" method="post" action="{{ href }}issues/{{ issue.id }}/deleteissue/">
+		<button style="margin-top: 1px" type="submit" class="btn btn-primary">
+			Delete
+		</button>
+		{% csrf_token %}
+	</form>
+</div>
+{% endif %}
+
 <div class="detail-issue-top">
 	{{ issue.content|linebreaks }}
 </div>
 <div class="detail-issue-bottom">
-	<b>{{ issue.author }}</b><i> on {{ issue.published.date }} at {{ issue.published.time }}</i>
+	<i class="icon-user"></i>&nbsp;<b>{{ issue.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ issue.published.time }} {{ issue.published.date }}
+		{% if issue.repository.user.username == user.username or user in team or issue.author == user %}
+		| <a href="{{ href }}issues/{{ issue.id }}/edit/"><i class="icon-edit"></i>Edit</a>{% endif %}</span>
 </div>
 {% if comments %}
 {% for comment in comments %}
 <div class="comment-top">
-	{{ comment.comment }}
+	{{ comment.comment|linebreaks }}
 </div>
 <div class="comment-bottom">
-	<b>{{ comment.author }}</b><i> on {{ comment.date.date }} at {{ comment.date.time }}</i>
+	<i class="icon-user"></i>&nbsp;<b>{{ comment.author }}</b><span class="comment-datetime"><i class="icon-time"></i>&nbsp;{{ comment.date.time }} {{ comment.date.date }} {% if issue.repository.user.username == user.username or user in team or comment.author ==  user %}
+		| <a href="{{ href }}issues/{{ issue.id }}/editcomment/{{ comment.id }}/"><i class="icon-edit"></i>Edit</a> <a href="{{ href }}issues/{{ issue.id }}/removecomment/{{ comment.id }}/"><i class="icon-remove"></i>Remove</a>{% endif %}</span>
 </div>
 {% endfor %}
 {% endif %}
 
-{% if issue.author.username == user.username or issue.repository.user.username == user.username %}
+{% if issue.repository.user.username == user.username or user in team %}
 <div id="closeopen">
 	<form method="post" name="submit" action="{{ href }}issues/{{ issue.id }}/status/">
 		<button type="submit" class="btn btn-primary">
@@ -64,4 +88,11 @@
 	</form>
 </div>
 {% endif %}
+<script type="text/javascript">
+	$(function() {
+		$("#id_deadline").datepicker({
+			dateFormat : "yy-mm-dd"
+		}).val()
+	}); 
+</script>
 {% endblock %}
