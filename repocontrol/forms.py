@@ -26,3 +26,6 @@ class NewComment(forms.ModelForm):
         
 class EditComment(forms.Form):
     comment = forms.CharField(widget=forms.widgets.Textarea(attrs={'class':'input-xlarge'}))
+    
+class FileForm(forms.Form):
+    files = forms.FileField(label="Your files")

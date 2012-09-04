@@ -1,0 +1,36 @@
+{% extends "base/index.html" %}
+{% block navigation %}
+{% include "repocontrol/profilemenu.html" %}
+{% endblock %}
+{% block content %}
+<div class="reponame">
+	<b>{{ reponame }}</b>
+	<hr />
+</div>
+{% if message %}
+<div class="alert alert-success">
+	<button type="button" class="close" data-dismiss="alert">
+		×
+	</button>
+	<strong><span style="text-align: center">{{ message }}</span></strong>
+</div>
+{% endif %}
+
+<form action="{{ href }}addfiles/" method="post" enctype="multipart/form-data">
+	{% csrf_token %}
+	<p>
+		{{ form.non_field_errors }}
+	</p>
+	<p>
+		{{ form.files.label_tag }}
+	</p>
+	<p>
+		<input type="file" name="files" id="id_files" multiple="multiple" /><br />
+		{{ form.files.errors|striptags }}
+	</p>
+	<p>
+		<input type="submit" value="Upload" />
+	</p>
+</form>
+
+{% endblock %}

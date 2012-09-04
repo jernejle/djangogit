@@ -2,8 +2,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render_to_response, redirect
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
-from repocontrol.forms import NewRepo, NewComment, EditComment
-from djangogit.settings import TEMP_REPODIR, GITOLITE_CONF, TEMP_CLONE_DIR
+from repocontrol.forms import NewRepo, NewComment, EditComment, FileForm
+from djangogit.settings import TEMP_REPODIR, GITOLITE_CONF, TEMP_CLONE_DIR, UPLOAD_DIR
 from repocontrol.models import Repository, CommitComment
 from django.contrib.auth.models import User
 from djangogit import func
@@ -21,6 +21,7 @@ import re
 import pdb
 import json
 import os
+import shutil
 
 @login_required
 def addnewrepo(request):
@@ -485,3 +486,52 @@ def download(request,userid,slug):
     response = HttpResponse(wrapper, content_type='text/plain')
     response['Content-Length'] = os.path.getsize(filename)
     return response
+
+@login_required
+def addfiles(request,userid,slug):
+    template = "repocontrol/addfiles.html"
+    obj = func.getRepoObjorNone(userid, slug)
+    func.objOr404(obj)
+    user = User.objects.get(username=request.user)
+    
+    if not user.username == obj.get('user_obj').username:
+        return redirect("/%s/%s" %(userid,slug))
+    
+    if request.method == "POST":
+        form = FileForm(request.POST, request.FILES)
+        if form.is_valid():
+            files = request.FILES.getlist('files')
+            updir = UPLOAD_DIR + obj.get('user_obj').username + "/" + slug
+            if not os.path.exists(updir):
+                    os.makedirs(updir)
+            func.cloneLocalRepository(obj.get('reponame'), updir)
+            temp_repo = Repo(updir)
+            file_names = []
+            for f in files:
+                file_names.append(f.name)
+                with open(updir + "/" + f.name, 'wb+') as dest:
+                    for chunk in f.chunks():
+                        dest.write(chunk)
+            
+            for name in file_names:
+                temp_repo.git.execute(["git","add",name])
+
+            com_author = user.username + " <" + user.email + ">"
+            com_message = "Files " + ', '.join(file_names) + " added"
+            au = "--author="+ "\""+ com_author +"\""
+            try:
+                temp_repo.git.execute(["git","commit","-m",com_message,au])
+                command = ["/usr/share/gitolite/gl-admin-push"]
+                temp_repo.git.execute(command)
+            except:
+                return HttpResponse("Cannot commit, push failed!")
+            
+            form = FileForm()
+            message = "Your files has been successfully added"
+        else:
+            message = "Error!"
+        return render_to_response(template, {'message': message,'form':form,'reponame':obj.get('reponame') , 'activelink':'addfiles', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+    elif request.method == "GET":
+        form = FileForm()
+        return render_to_response(template, {'form':form,'reponame':obj.get('reponame') , 'activelink':'addfiles', 'href':"/%d/%s/" % (obj.get('user_obj').id, slug)}, context_instance=RequestContext(request))
+    

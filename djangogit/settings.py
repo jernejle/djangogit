@@ -10,6 +10,7 @@ GITOLITE_ADMIN_REPO = "/srv/git/repositories/gitolite-admin.git"
 REPODIR = "/srv/git/repositories/"
 LOG_FILE = os.path.join(ROOT,"../logs/log")
 TEMP_CLONE_DIR = "/srv/djangogit/temprepo"
+UPLOAD_DIR = "/srv/djangogit/uploaddir/"
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -56,12 +57,12 @@ USE_TZ = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = os.path.join(ROOT,"../media/")
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files

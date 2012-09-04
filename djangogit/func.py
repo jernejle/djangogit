@@ -20,6 +20,10 @@ def cloneAdminRepo():
         command = "git clone %s %s" % (GITOLITE_ADMIN_REPO, TEMP_REPODIR)
         runAndLog(command)
         
+def cloneLocalRepository(reponame,path):
+    command = "git clone %s %s" % (REPODIR + reponame + ".git", path)
+    runAndLog(command)
+        
 
 def addKey(username, key, keyid):
     fulldir = TEMP_REPODIR + "/keydir/%s" % username
@@ -265,9 +269,6 @@ def addToZip(zippath, toZipPath, reponame):
     d = toZipPath
     zf = zipfile.ZipFile(zippath, mode="w")
     for root, dirs, files in os.walk(d):
-        print "root je " + str(root)
-        print "dirs je " + str(dirs)
-
         dest_name = root.replace(TEMP_CLONE_DIR + "/%s" %(reponame),'')
         for file in files:
                 if re.findall("\/\.(.*)", root):
